@@ -8,3 +8,8 @@ C:\Users\Vladislav\RiderProjects\EuclidImage\EuclidImage\obj\Debug\EuclidImage.c
 C:\Users\Vladislav\RiderProjects\EuclidImage\EuclidImage\obj\Debug\EuclidImage.exe
 C:\Users\Vladislav\RiderProjects\EuclidImage\EuclidImage\obj\Debug\EuclidImage.pdb
 C:\Users\Vladislav\RiderProjects\EuclidImage\EuclidImage\obj\Debug\EuclidImage.Form1.resources
+C:\Users\Vladislav\RiderProjects\EuclidImage\EuclidImage\bin\Debug\ImageProcessor.dll
+C:\Users\Vladislav\RiderProjects\EuclidImage\EuclidImage\bin\Debug\System.ValueTuple.dll
+C:\Users\Vladislav\RiderProjects\EuclidImage\EuclidImage\bin\Debug\ImageProcessor.xml
+C:\Users\Vladislav\RiderProjects\EuclidImage\EuclidImage\bin\Debug\System.ValueTuple.xml
+C:\Users\Vladislav\RiderProjects\EuclidImage\EuclidImage\obj\Debug\EuclidImage.csproj.CopyComplete

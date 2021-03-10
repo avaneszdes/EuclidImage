@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ImageProcessor.Imaging;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
@@ -30,6 +31,7 @@ namespace EuclidImage
         string file;
         Bitmap myBitmap;
         double[,] matr;
+        int[,] znak;
         Bitmap secondBitMap;
 
         private void button1_Click(object sender, EventArgs e)
@@ -113,7 +115,7 @@ namespace EuclidImage
                         dataGridView1.Columns[i].Width = 50;
                     }
 
-
+                    znak = new int[bmpWidth, bmpHeight];
                     for (int i = 0; i < bmpWidth; i++)
                     {
                         for (int j = 0; j < bmpHeight; j++)
@@ -122,10 +124,12 @@ namespace EuclidImage
                             if (a.R == 255 && a.G == 255 && a.B == 255)
                             {
                                 pixels[i, j] = 0;
+                                znak[i, j] = 0;
                             }
                             else
                             {
                                 pixels[i, j] = 1;
+                                znak[i, j] = 1;
                             }
                             dataGridView1[i, j].Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
                             dataGridView1[j, i].Value = pixels[i, j];
@@ -161,7 +165,15 @@ namespace EuclidImage
             {
                 for (int j = 0; j < myBitmap.Height; j++)
                 {
-                    dataGridView1[j, i].Value = res[k];
+                    if (znak[i, j] == 0)
+                    {
+                        dataGridView1[j, i].Value = res[k] * -1;
+
+                    }
+                    else
+                    {
+                        dataGridView1[j, i].Value = res[k];
+                    }
                     k++;
                 }
             }
@@ -196,8 +208,13 @@ namespace EuclidImage
             chart1.Series[0].Points.Clear();
             matr = new double[myBitmap.Width, myBitmap.Height];
             for (int i = 0; i < dataGridView1.RowCount; i++)
+            {
                 for (int j = 0; j < dataGridView1.ColumnCount; j++)
+                {
                     matr[i, j] = double.Parse(dataGridView1.Rows[i].Cells[j].Value.ToString());
+                }
+            }
+
 
             int Count = 0;     ///Коллво цветов в изобр
 
@@ -210,7 +227,9 @@ namespace EuclidImage
                 for (int j = 0; j < matr.GetLength(1); j++)
                 {
                     if (rezul.ContainsKey(matr[i, j]))
+                    {
                         rezul[matr[i, j]]++;
+                    }
                     else
                     {
                         rezul.Add(matr[i, j], 1); Count++;
@@ -237,6 +256,7 @@ namespace EuclidImage
             }
 
             Array.Sort(difColor);
+            Array.Reverse(difColor);
 
             int indexForColor = 255 / Count;
             int Position;
@@ -458,7 +478,7 @@ namespace EuclidImage
             int Count = 0;     ///Коллво цветов в изобр
 
             Dictionary<double, double> rezul = new Dictionary<double, double>(); //считаем эл-ты в массиве
-            for (int i = matr.GetLength(0) - 1; i > -1 ; i--)
+            for (int i = matr.GetLength(0) - 1; i > -1; i--)
             {
                 for (int j = matr.GetLength(1) - 1; j > -1; j--)
                 {
@@ -528,25 +548,60 @@ namespace EuclidImage
 
         private void button7_Click(object sender, EventArgs e)
         {
-            var changebleBitmap = new Bitmap(myBitmap.Width, myBitmap.Height);
-            for (int x = 0; x < changebleBitmap.Width; x++)
+            saveFileDialog1 = new SaveFileDialog
             {
-                for (int y = 0; y < changebleBitmap.Height; y++)
-                {
-                    if (int.Parse(dataGridView1[x, y].Value.ToString()) == 1)
-                    {
-                        changebleBitmap.SetPixel(x, y, Color.White);
-                        dataGridView1[x, y].Value = 0;
-                    }
-                    else
-                    {
-                        changebleBitmap.SetPixel(x, y, Color.Black);
-                        dataGridView1[x, y].Value = 1;
-                    }
-                }
+                InitialDirectory = @"C:\Desktop",
+                Title = "Browse Text Files",
+
+                CheckFileExists = true,
+                CheckPathExists = true,
+
+                DefaultExt = "bmp",
+                Filter = "bmp files (*.bmp)|*.bmp",
+                FilterIndex = 2,
+                RestoreDirectory = true,
+            };
+
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                string path = saveFileDialog1.FileName;
+                myBitmap.Save(path);
+            }
+        }
+
+        private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            colorDialog1 = new ColorDialog();
+
+            if (colorDialog1.ShowDialog() == DialogResult.OK)
+            {
+                secondBitMap.SetPixel(e.ColumnIndex, e.RowIndex, colorDialog1.Color);
+                pictureBox2.Image = secondBitMap;
+
+            }
+            
+
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+
+            for (int i = 0; i < myBitmap.Width; i++)
+            {
+                DataGridViewRow row2 = dataGridView1.Rows[i];
+                dataGridView1.Columns[i].Width = 90;
             }
 
-            pictureBox1.Image = changebleBitmap;
+            for (int i = 0; i < myBitmap.Width; i++)
+            {
+                for (int j = 0; j < myBitmap.Height; j++)
+                {
+                    Color a = myBitmap.GetPixel(j, i);
+                    dataGridView1[j, i].Value = a.R + "-" + a.G + "-" + a.B;
+
+                }
+
+            }
         }
     }
 
