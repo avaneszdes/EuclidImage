@@ -71,18 +71,8 @@ namespace EuclidImage
                     pictureBox1.Height = myBitmap.Height + 120;
                     pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
 
-                    if (myBitmap.Width > 500)
-                    {
-                        dataGridView1.Width = 600;
-                        dataGridView1.Height = 600;
-                        dataGridView1.ScrollBars = ScrollBars.Both;
-                    }
-                    else
-                    {
-                        dataGridView1.Width = 50 * myBitmap.Width;
-                        dataGridView1.Height = 25 * myBitmap.Height;
-                    }
-
+                    dataGridView1.Width = 50 * myBitmap.Width;
+                    dataGridView1.Height = 25 * myBitmap.Height;
 
                     panel2.Location = new Point(panel2.Location.X, dataGridView1.Height + 20);
 
@@ -155,6 +145,17 @@ namespace EuclidImage
         {
             button3.Enabled = true;
             button4.Enabled = true;
+            chart1.Height = panel2.Height;
+            dataGridView1.Height = 25 * myBitmap.Height;
+            chart1.Location = new Point(chart1.Location.X, dataGridView1.Height + 20);
+            
+
+            for (int i = 0; i < myBitmap.Width; i++)
+            {
+                DataGridViewRow row2 = dataGridView1.Rows[i];
+                dataGridView1.Columns[i].Width = 50;
+            }
+            dataGridView1.ScrollBars = ScrollBars.None;
 
 
             var res = GetCalculateEwclidDistance(GetBitArray());
@@ -572,26 +573,48 @@ namespace EuclidImage
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             colorDialog1 = new ColorDialog();
+            Bitmap newBmp = new Bitmap(myBitmap.Width, myBitmap.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
 
             if (colorDialog1.ShowDialog() == DialogResult.OK)
             {
-                secondBitMap.SetPixel(e.ColumnIndex, e.RowIndex, colorDialog1.Color);
-                pictureBox2.Image = secondBitMap;
 
+                for (int i = 0; i < newBmp.Width; i++)
+                {
+                    for (int j = 0; j < newBmp.Height; j++)
+                    {
+                        if (e.RowIndex == j && i == e.ColumnIndex)
+                        {
+                            newBmp.SetPixel(e.ColumnIndex, e.RowIndex, colorDialog1.Color);
+                            dataGridView1[i, j].Value = colorDialog1.Color.R + "-" + colorDialog1.Color.G + "-" + colorDialog1.Color.B;
+                            dataGridView1.Update();
+                        }
+                        else
+                        {
+                            newBmp.SetPixel(i, j, myBitmap.GetPixel(i, j));
+                        }
+
+                    }
+                }
+                myBitmap = newBmp;
+                pictureBox1.Image = myBitmap;
             }
-            
+
 
         }
 
         private void button8_Click(object sender, EventArgs e)
         {
-
+            dataGridView1.Height = 25 * myBitmap.Height + 25;
+            chart1.Height = chart1.Height - 25;
+            chart1.Location = new Point(chart1.Location.X, dataGridView1.Height + 20);
+            dataGridView1.ScrollBars = ScrollBars.Horizontal;
             for (int i = 0; i < myBitmap.Width; i++)
             {
                 DataGridViewRow row2 = dataGridView1.Rows[i];
-                dataGridView1.Columns[i].Width = 90;
+                dataGridView1.Columns[i].Width = 120;
             }
-
+            dataGridView1.ScrollBars = ScrollBars.Horizontal;
             for (int i = 0; i < myBitmap.Width; i++)
             {
                 for (int j = 0; j < myBitmap.Height; j++)
