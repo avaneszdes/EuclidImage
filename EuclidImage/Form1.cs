@@ -13,8 +13,19 @@ namespace EuclidImage
         public Form1()
         {
             InitializeComponent();
-            this.Width = 200;
-            this.Height = 100;
+            pictureBox1.Hide();
+            dataGridView1.Hide();
+            dataGridView1.Font = new Font("Verdana", 10, FontStyle.Italic);
+            dataGridView1.AutoGenerateColumns = false;
+            panel2.Location = new Point(5, 5);
+            this.Width = panel2.Width + 25;
+            this.Height = panel2.Height + 50;
+            chart1.ChartAreas[0].AxisX.Interval = 0.1;
+            button2.Enabled = false;
+            button3.Enabled = false;
+            button4.Enabled = false;
+            button5.Enabled = false;
+            button6.Enabled = false;
 
         }
 
@@ -26,7 +37,7 @@ namespace EuclidImage
 
         private void button1_Click(object sender, EventArgs e)
         {
-
+           
             try
             {
 
@@ -629,29 +640,7 @@ namespace EuclidImage
         private void button9_Click(object sender, EventArgs e)
         {
            
-            if (textBox1.Text == "12345")
-            {
-                button9.Hide();
-                textBox1.Hide();
-                label1.Hide();
-                pictureBox1.Hide();
-                dataGridView1.Hide();
-                dataGridView1.Font = new Font("Verdana", 10, FontStyle.Italic);
-                dataGridView1.AutoGenerateColumns = false;
-                panel2.Location = new Point(5, 5);
-                this.Width = panel2.Width + 25;
-                this.Height = panel2.Height + 50;
-                chart1.ChartAreas[0].AxisX.Interval = 0.1;
-                button2.Enabled = false;
-                button3.Enabled = false;
-                button4.Enabled = false;
-                button5.Enabled = false;
-                button6.Enabled = false;
-            }
-            else
-            {
-                textBox1.BackColor = Color.Red;
-            }
+           
             
         }
     }
