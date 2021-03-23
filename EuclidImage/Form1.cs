@@ -76,23 +76,39 @@ namespace EuclidImage
                     file = openFileDialog1.FileName;
                     myBitmap = new Bitmap(file);
 
+
+
+
                     pictureBox1.Width = myBitmap.Width + 120;
                     pictureBox1.Height = myBitmap.Height + 120;
                     pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
 
-                    dataGridView1.Width = 50 * myBitmap.Width;
-                    dataGridView1.Height = 25 * myBitmap.Height;
+                    if ((50 * myBitmap.Width) > 750)
+                    {
+                        dataGridView1.Width = 750;
+                        dataGridView1.Height = 375;
+                        dataGridView1.ScrollBars = ScrollBars.Both;
+                    }
+                    else
+                    {
+                        dataGridView1.Width = 50 * myBitmap.Width;
+                        dataGridView1.Height = 25 * myBitmap.Height;
+                    }
+
+                    trackBar1.Height = dataGridView1.Height - 30;
+                    label1.Location = new Point(pictureBox1.Width + 30, label1.Location.Y);
+                    trackBar1.Location = new Point(pictureBox1.Width + 20, label1.Location.Y + 30);
 
                     panel2.Location = new Point(panel2.Location.X, dataGridView1.Height + 20);
 
-                    this.Width = myBitmap.Width + 160 + dataGridView1.Width;
+                    this.Width = myBitmap.Width + 160 + dataGridView1.Width + trackBar1.Width + 3;
                     this.Height = dataGridView1.Height + panel2.Height + 65;
 
-                    chart1.Width = dataGridView1.Width;
+                    chart1.Width = dataGridView1.Width + trackBar1.Width;
                     chart1.Height = panel2.Height;
 
-                    dataGridView1.Location = new Point(pictureBox1.Width + 20, dataGridView1.Location.Y);
-                    chart1.Location = new Point(dataGridView1.Location.X, dataGridView1.Height + 20);
+                    dataGridView1.Location = new Point(pictureBox1.Width + 20 + trackBar1.Width + 3, dataGridView1.Location.Y);
+                    chart1.Location = new Point(dataGridView1.Location.X - trackBar1.Width - 3, dataGridView1.Height + 20);
                     pictureBox1.Image = myBitmap;
 
                     var bmpWidth = myBitmap.Width;
@@ -113,29 +129,39 @@ namespace EuclidImage
                         DataGridViewRow row2 = dataGridView1.Rows[i];
                         dataGridView1.Columns[i].Width = 50;
                     }
+                    var isBinaryImage = IsBinaryImage(myBitmap);
 
-                    znak = new int[bmpWidth, bmpHeight];
-                    for (int i = 0; i < bmpWidth; i++)
+                    if (!isBinaryImage)
                     {
-                        for (int j = 0; j < bmpHeight; j++)
+                        znak = new int[bmpWidth, bmpHeight];
+                        for (int i = 0; i < bmpWidth; i++)
                         {
-                            Color a = myBitmap.GetPixel(j, i);
-                            if (a.R == 255 && a.G == 255 && a.B == 255)
+                            for (int j = 0; j < bmpHeight; j++)
                             {
-                                pixels[i, j] = 0;
-                                znak[i, j] = 0;
+                                Color a = myBitmap.GetPixel(j, i);
+                                if (a.R == 255 && a.G == 255 && a.B == 255)
+                                {
+                                    pixels[i, j] = 0;
+                                    znak[i, j] = 0;
+                                }
+                                else
+                                {
+                                    pixels[i, j] = 1;
+                                    znak[i, j] = 1;
+                                }
+                                dataGridView1[i, j].Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                                dataGridView1[j, i].Value = pixels[i, j];
+
                             }
-                            else
-                            {
-                                pixels[i, j] = 1;
-                                znak[i, j] = 1;
-                            }
-                            dataGridView1[i, j].Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                            dataGridView1[j, i].Value = pixels[i, j];
 
                         }
+                    }
+                    else
+                    {
 
                     }
+
+
                 }
 
 
@@ -146,7 +172,6 @@ namespace EuclidImage
                 MessageBox.Show(ex.Message);
             }
             button2.Enabled = true;
-            button5.Enabled = true;
             button7.Enabled = true;
 
         }
@@ -205,37 +230,25 @@ namespace EuclidImage
 
         }
 
-       
 
-       
         private void button4_Click(object sender, EventArgs e)
         {
             SaveImg(secondBitMap);
         }
 
-       
 
-       
+
+
         private void button5_Click(object sender, EventArgs e)
         {
-
-            var changebleBitmap = new Bitmap(myBitmap.Width, myBitmap.Height);
-            for (int x = 0; x < changebleBitmap.Width; x++)
-            {
-                for (int y = 0; y < changebleBitmap.Height; y++)
-                {
-                    if (int.Parse(dataGridView1[x, y].Value.ToString()) == 1)
-                    {
-                        changebleBitmap.SetPixel(x, y, Color.Black);
-                    }
-                    else
-                    {
-                        changebleBitmap.SetPixel(x, y, Color.White);
-                    }
-                }
-            }
-
-            pictureBox1.Image = changebleBitmap;
+            secondBitMap = CreateGrayscaleBitmap(secondBitMap);
+            button6.Enabled = true;
+            pictureBox2.Show();
+            pictureBox2.Image = secondBitMap;
+            pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBox2.Location = new Point(pictureBox1.Location.X, pictureBox1.Height + 15);
+            pictureBox2.Width = secondBitMap.Width + 120;
+            pictureBox2.Height = secondBitMap.Height + 120;
         }
 
         private void button6_Click(object sender, EventArgs e)
@@ -445,8 +458,28 @@ namespace EuclidImage
             return res;
         }
 
+
+        private bool IsBinaryImage(Bitmap bitmap)
+        {
+            for (int i = 0; i < bitmap.Width; i++)
+            {
+                for (int j = 0; j < bitmap.Height; j++)
+                {
+                    var pixel = bitmap.GetPixel(i, j);
+                    var pixelColor = (pixel.R + pixel.G + pixel.B);
+                    if (pixelColor != 765 || pixelColor != 0)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         private Bitmap CreateGrayscaleBitmap(Bitmap secondBitMap)
         {
+            chart1.Series[0].Points.Clear();
             matr = new double[myBitmap.Width, myBitmap.Height];
             for (int i = 0; i < dataGridView1.RowCount; i++)
             {
@@ -480,9 +513,10 @@ namespace EuclidImage
             countColor = new double[Count];
             int l = 0;
 
+
+
             foreach (KeyValuePair<double, double> par in rezul)
             {
-
                 chart1.Series[0].Points.AddXY(par.Key, par.Value);
                 chart1.Series[0].IsValueShownAsLabel = true;
                 difColor[l] = par.Key;
@@ -519,6 +553,63 @@ namespace EuclidImage
             }
 
             return secondBitMap;
+        }
+
+        private void trackBar1_Scroll(object sender, EventArgs e)
+        {
+            label1.Text = trackBar1.Value.ToString();
+            var trackBarValue = int.Parse(trackBar1.Value.ToString());
+            if (trackBarValue >= 175)
+            {
+                trackBar1.BackColor = Color.Red;
+            }
+            else if (trackBarValue >= 150 && trackBarValue < 175)
+            {
+                trackBar1.BackColor = Color.Tomato;
+            }
+            else if (trackBarValue >= 100 && trackBarValue < 150)
+            {
+                trackBar1.BackColor = Color.LightSalmon;
+            }
+            else
+            {
+                trackBar1.BackColor = SystemColors.GradientInactiveCaption;
+            }
+
+            var changebleBitmap = new Bitmap(myBitmap.Width, myBitmap.Height);
+            for (int x = 0; x < changebleBitmap.Width; x++)
+            {
+                for (int y = 0; y < changebleBitmap.Height; y++)
+                {
+                    Color color = myBitmap.GetPixel(x, y);
+                    int avgColor = (color.R + color.G + color.B) / 3;
+                    if (avgColor > trackBar1.Value)
+                    {
+
+                        changebleBitmap.SetPixel(x, y, Color.White);
+                        dataGridView1[x, y].Value = 0;
+                    }
+                    else
+                    {
+                        changebleBitmap.SetPixel(x, y, Color.Black);
+                        dataGridView1[x, y].Value = 1;
+
+                    }
+                }
+            }
+
+
+            secondBitMap = CreateGrayscaleBitmap(changebleBitmap);
+            button6.Enabled = true;
+            pictureBox2.Show();
+            pictureBox2.Image = secondBitMap;
+            pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBox2.Location = new Point(pictureBox1.Location.X, pictureBox1.Height + 15);
+            pictureBox2.Width = secondBitMap.Width + 120;
+            pictureBox2.Height = secondBitMap.Height + 120;
+
+
+            pictureBox2.Image = changebleBitmap;
         }
     }
 
