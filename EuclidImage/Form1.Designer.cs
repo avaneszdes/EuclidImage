@@ -29,9 +29,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea12 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend12 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series12 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.button1 = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
@@ -189,7 +189,7 @@
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(132, 40);
             this.button5.TabIndex = 6;
-            this.button5.Text = "Глобальная бинаризация";
+            this.button5.Text = "Бинаризация с учетом средней яркости";
             this.button5.UseVisualStyleBackColor = false;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
@@ -200,7 +200,7 @@
             this.dataGridView1.BackgroundColor = System.Drawing.SystemColors.ActiveCaption;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.ColumnHeadersVisible = false;
-            this.dataGridView1.Location = new System.Drawing.Point(692, 13);
+            this.dataGridView1.Location = new System.Drawing.Point(538, 12);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.RowTemplate.Height = 25;
@@ -211,23 +211,24 @@
             // 
             // chart1
             // 
-            chartArea12.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea12);
-            legend12.Enabled = false;
-            legend12.Name = "Legend1";
-            this.chart1.Legends.Add(legend12);
+            chartArea4.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea4);
+            legend4.Enabled = false;
+            legend4.Name = "Legend1";
+            this.chart1.Legends.Add(legend4);
             this.chart1.Location = new System.Drawing.Point(162, 321);
             this.chart1.Name = "chart1";
-            series12.BackImageTransparentColor = System.Drawing.Color.Transparent;
-            series12.ChartArea = "ChartArea1";
-            series12.Color = System.Drawing.Color.Lime;
-            series12.CustomProperties = "DrawingStyle=Wedge, MinPixelPointWidth=20, PointWidth=2, MaxPixelPointWidth=80";
-            series12.EmptyPointStyle.BorderColor = System.Drawing.Color.Red;
-            series12.Legend = "Legend1";
-            series12.Name = "Series1";
-            series12.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
-            series12.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
-            this.chart1.Series.Add(series12);
+            series4.BackImageTransparentColor = System.Drawing.Color.Transparent;
+            series4.ChartArea = "ChartArea1";
+            series4.Color = System.Drawing.Color.Lime;
+            series4.CustomProperties = "DrawingStyle=Cylinder, MinPixelPointWidth=20, PointWidth=2, MaxPixelPointWidth=80" +
+    "";
+            series4.EmptyPointStyle.BorderColor = System.Drawing.Color.Red;
+            series4.Legend = "Legend1";
+            series4.Name = "Series1";
+            series4.YAxisType = System.Windows.Forms.DataVisualization.Charting.AxisType.Secondary;
+            series4.YValueType = System.Windows.Forms.DataVisualization.Charting.ChartValueType.Double;
+            this.chart1.Series.Add(series4);
             this.chart1.Size = new System.Drawing.Size(732, 187);
             this.chart1.TabIndex = 6;
             this.chart1.Text = "chart1";
@@ -235,7 +236,7 @@
             // pictureBox2
             // 
             this.pictureBox2.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.pictureBox2.Location = new System.Drawing.Point(989, 267);
+            this.pictureBox2.Location = new System.Drawing.Point(375, 97);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(157, 154);
             this.pictureBox2.TabIndex = 7;
@@ -270,7 +271,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.ClientSize = new System.Drawing.Size(1349, 731);
+            this.ClientSize = new System.Drawing.Size(1431, 731);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.trackBar1);
             this.Controls.Add(this.pictureBox2);

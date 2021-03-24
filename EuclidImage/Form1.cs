@@ -35,6 +35,7 @@ namespace EuclidImage
         double[,] matr;
         int[,] znak;
         Bitmap secondBitMap;
+        double[,] borderValues;
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -48,7 +49,6 @@ namespace EuclidImage
 
             try
             {
-
                 openFileDialog1 = new OpenFileDialog
                 {
                     InitialDirectory = @"C:\",
@@ -76,9 +76,6 @@ namespace EuclidImage
                     file = openFileDialog1.FileName;
                     myBitmap = new Bitmap(file);
 
-
-
-
                     pictureBox1.Width = myBitmap.Width + 120;
                     pictureBox1.Height = myBitmap.Height + 120;
                     pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
@@ -104,7 +101,7 @@ namespace EuclidImage
                     this.Width = myBitmap.Width + 160 + dataGridView1.Width + trackBar1.Width + 3;
                     this.Height = dataGridView1.Height + panel2.Height + 65;
 
-                    chart1.Width = dataGridView1.Width + trackBar1.Width;
+                    chart1.Width = dataGridView1.Width + trackBar1.Width - 3;
                     chart1.Height = panel2.Height;
 
                     dataGridView1.Location = new Point(pictureBox1.Width + 20 + trackBar1.Width + 3, dataGridView1.Location.Y);
@@ -131,14 +128,48 @@ namespace EuclidImage
                     }
                     var isBinaryImage = IsBinaryImage(myBitmap);
 
+
+
                     if (!isBinaryImage)
                     {
                         znak = new int[bmpWidth, bmpHeight];
+                        borderValues = new double[bmpWidth, bmpHeight];
+
                         for (int i = 0; i < bmpWidth; i++)
                         {
                             for (int j = 0; j < bmpHeight; j++)
                             {
                                 Color a = myBitmap.GetPixel(j, i);
+                                int avgColor = (a.R + a.G + a.B) / 3;
+                                if (a.R == 255 && a.G == 255 && a.B == 255)
+                                {
+                                    pixels[i, j] = 0;
+                                    znak[i, j] = 0;
+                                }
+                                else
+                                {
+                                    pixels[i, j] = 1;
+                                    znak[i, j] = 1;
+                                }
+                                dataGridView1[i, j].Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                                dataGridView1[j, i].Value = avgColor;
+                                borderValues[i, j] = 255 - avgColor;
+
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        znak = new int[bmpWidth, bmpHeight];
+                        borderValues = new double[bmpWidth, bmpHeight];
+
+                        for (int i = 0; i < bmpWidth; i++)
+                        {
+                            for (int j = 0; j < bmpHeight; j++)
+                            {
+                                Color a = myBitmap.GetPixel(j, i);
+                                int avgColor = (a.R + a.G + a.B) / 3;
                                 if (a.R == 255 && a.G == 255 && a.B == 255)
                                 {
                                     pixels[i, j] = 0;
@@ -152,20 +183,16 @@ namespace EuclidImage
                                 dataGridView1[i, j].Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
                                 dataGridView1[j, i].Value = pixels[i, j];
 
+
                             }
 
                         }
                     }
-                    else
-                    {
 
-                    }
+
 
 
                 }
-
-
-
             }
             catch (Exception ex)
             {
@@ -173,6 +200,7 @@ namespace EuclidImage
             }
             button2.Enabled = true;
             button7.Enabled = true;
+            button5.Enabled = true;
 
         }
 
@@ -241,14 +269,58 @@ namespace EuclidImage
 
         private void button5_Click(object sender, EventArgs e)
         {
-            secondBitMap = CreateGrayscaleBitmap(secondBitMap);
-            button6.Enabled = true;
+
+            //borderValues
+            double[,] borderValuesArr = new double[borderValues.GetLength(0), borderValues.GetLength(1)];
+
+            for (int i = 1; i < borderValues.GetLength(0) - 1; i++)
+            {
+                for (int j = 1; j < borderValues.GetLength(1) - 1; j++)
+                {
+                    var pixelValue = 255 - borderValues[i, j];
+                    if (pixelValue < borderValues[i - 1, j-1] 
+                        || pixelValue < borderValues[i - 1, j] 
+                        || pixelValue < borderValues[i - 1, j+ 1]
+                        || pixelValue < borderValues[i, j -1]
+                        || pixelValue < borderValues[i, j + 1]
+                        || pixelValue < borderValues[i + 1, j -1]
+                        || pixelValue < borderValues[i + 1, j]
+                        || pixelValue < borderValues[i + 1, j + 1])
+                    {
+                        borderValuesArr[j, i] = 1;
+                    }
+                    else
+                    {
+                        borderValuesArr[j, i] = 0;
+                    }
+                }
+            }
+
+
+            var bitmap = new Bitmap(myBitmap.Width, myBitmap.Height);
+
+            for (int i = 0; i < myBitmap.Width; i++)
+            {
+                for (int j = 0; j < myBitmap.Height; j++)
+                {
+                    
+                    if (borderValuesArr[i,j] == 0)
+                    {
+                        bitmap.SetPixel(i, j, Color.White);
+                    }
+                    else
+                    {
+                        bitmap.SetPixel(i, j, Color.Black);
+                    }
+                }
+            }
+
             pictureBox2.Show();
-            pictureBox2.Image = secondBitMap;
+            pictureBox2.Image = bitmap;
             pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox2.Location = new Point(pictureBox1.Location.X, pictureBox1.Height + 15);
-            pictureBox2.Width = secondBitMap.Width + 120;
-            pictureBox2.Height = secondBitMap.Height + 120;
+            pictureBox2.Width = bitmap.Width + 120;
+            pictureBox2.Height = bitmap.Height + 120;
         }
 
         private void button6_Click(object sender, EventArgs e)
@@ -461,20 +533,26 @@ namespace EuclidImage
 
         private bool IsBinaryImage(Bitmap bitmap)
         {
+            var arr = new int[bitmap.Width * bitmap.Height];
+            int k = 0;
             for (int i = 0; i < bitmap.Width; i++)
             {
                 for (int j = 0; j < bitmap.Height; j++)
                 {
                     var pixel = bitmap.GetPixel(i, j);
                     var pixelColor = (pixel.R + pixel.G + pixel.B);
-                    if (pixelColor != 765 || pixelColor != 0)
+                    if (pixelColor == 765 || pixelColor == 0)
                     {
-                        return false;
+                        arr[k++] = 0;
+                    }
+                    else
+                    {
+                        arr[k++] = 1;
                     }
                 }
             }
 
-            return true;
+            return !arr.Contains(1);
         }
 
         private Bitmap CreateGrayscaleBitmap(Bitmap secondBitMap)
