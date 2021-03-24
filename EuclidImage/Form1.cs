@@ -20,33 +20,16 @@ namespace EuclidImage
             this.Width = panel2.Width + 25;
             this.Height = panel2.Height + 50;
             chart1.ChartAreas[0].AxisX.Interval = 0.1;
-            button2.Enabled = false;
-            button3.Enabled = false;
-            button4.Enabled = false;
-            button5.Enabled = false;
-            button6.Enabled = false;
-            button8.Enabled = false;
-            button7.Enabled = false;
 
         }
 
-        string file;
-        Bitmap myBitmap;
         double[,] matr;
-        int[,] znak;
+        int[,] signsForGreyScaleBitmap;
         Bitmap secondBitMap;
-        double[,] borderValues;
+        Bitmap firstBitmap;
 
         private void button1_Click(object sender, EventArgs e)
         {
-            button2.Enabled = false;
-            button3.Enabled = false;
-            button4.Enabled = false;
-            button5.Enabled = false;
-            button6.Enabled = false;
-            button8.Enabled = false;
-            button7.Enabled = false;
-
             try
             {
                 openFileDialog1 = new OpenFileDialog
@@ -73,14 +56,14 @@ namespace EuclidImage
                     pictureBox2.Hide();
                     pictureBox1.Show();
                     dataGridView1.Show();
-                    file = openFileDialog1.FileName;
-                    myBitmap = new Bitmap(file);
+                    var file = openFileDialog1.FileName;
+                    firstBitmap = new Bitmap(file);
 
-                    pictureBox1.Width = myBitmap.Width + 120;
-                    pictureBox1.Height = myBitmap.Height + 120;
+                    pictureBox1.Width = firstBitmap.Width + 120;
+                    pictureBox1.Height = firstBitmap.Height + 120;
                     pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
 
-                    if ((50 * myBitmap.Width) > 750)
+                    if ((50 * firstBitmap.Width) > 750)
                     {
                         dataGridView1.Width = 750;
                         dataGridView1.Height = 375;
@@ -88,8 +71,8 @@ namespace EuclidImage
                     }
                     else
                     {
-                        dataGridView1.Width = 50 * myBitmap.Width;
-                        dataGridView1.Height = 25 * myBitmap.Height;
+                        dataGridView1.Width = 50 * firstBitmap.Width;
+                        dataGridView1.Height = 25 * firstBitmap.Height;
                     }
 
                     trackBar1.Height = dataGridView1.Height - 30;
@@ -98,18 +81,18 @@ namespace EuclidImage
 
                     panel2.Location = new Point(panel2.Location.X, dataGridView1.Height + 20);
 
-                    this.Width = myBitmap.Width + 160 + dataGridView1.Width + trackBar1.Width + 3;
+                    this.Width = firstBitmap.Width + 160 + dataGridView1.Width + trackBar1.Width + 3;
                     this.Height = dataGridView1.Height + panel2.Height + 65;
 
-                    chart1.Width = dataGridView1.Width + trackBar1.Width - 3;
+                    chart1.Width = dataGridView1.Width + trackBar1.Width +3;
                     chart1.Height = panel2.Height;
 
-                    dataGridView1.Location = new Point(pictureBox1.Width + 20 + trackBar1.Width + 3, dataGridView1.Location.Y);
-                    chart1.Location = new Point(dataGridView1.Location.X - trackBar1.Width - 3, dataGridView1.Height + 20);
-                    pictureBox1.Image = myBitmap;
+                    dataGridView1.Location = new Point(pictureBox1.Width + 20 + trackBar1.Width + 6, dataGridView1.Location.Y);
+                    chart1.Location = new Point(dataGridView1.Location.X - trackBar1.Width - 5, dataGridView1.Height + 20);
+                    pictureBox1.Image = firstBitmap;
 
-                    var bmpWidth = myBitmap.Width;
-                    var bmpHeight = myBitmap.Height;
+                    var bmpWidth = firstBitmap.Width;
+                    var bmpHeight = firstBitmap.Height;
                     int[,] pixels = new int[bmpWidth, bmpHeight];
 
                     dataGridView1.Columns.Clear();
@@ -126,71 +109,17 @@ namespace EuclidImage
                         DataGridViewRow row2 = dataGridView1.Rows[i];
                         dataGridView1.Columns[i].Width = 50;
                     }
-                    var isBinaryImage = IsBinaryImage(myBitmap);
-
+                    var isBinaryImage = IsBinaryImage(firstBitmap);
 
 
                     if (!isBinaryImage)
                     {
-                        znak = new int[bmpWidth, bmpHeight];
-                        borderValues = new double[bmpWidth, bmpHeight];
-
-                        for (int i = 0; i < bmpWidth; i++)
-                        {
-                            for (int j = 0; j < bmpHeight; j++)
-                            {
-                                Color a = myBitmap.GetPixel(j, i);
-                                int avgColor = (a.R + a.G + a.B) / 3;
-                                if (a.R == 255 && a.G == 255 && a.B == 255)
-                                {
-                                    pixels[i, j] = 0;
-                                    znak[i, j] = 0;
-                                }
-                                else
-                                {
-                                    pixels[i, j] = 1;
-                                    znak[i, j] = 1;
-                                }
-                                dataGridView1[i, j].Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                                dataGridView1[j, i].Value = avgColor;
-                                borderValues[i, j] = 255 - avgColor;
-
-                            }
-
-                        }
+                        AddDataToDataGridView(GetAvgValuesFromGreyScaleBitmap(firstBitmap));
                     }
                     else
                     {
-                        znak = new int[bmpWidth, bmpHeight];
-                        borderValues = new double[bmpWidth, bmpHeight];
-
-                        for (int i = 0; i < bmpWidth; i++)
-                        {
-                            for (int j = 0; j < bmpHeight; j++)
-                            {
-                                Color a = myBitmap.GetPixel(j, i);
-                                int avgColor = (a.R + a.G + a.B) / 3;
-                                if (a.R == 255 && a.G == 255 && a.B == 255)
-                                {
-                                    pixels[i, j] = 0;
-                                    znak[i, j] = 0;
-                                }
-                                else
-                                {
-                                    pixels[i, j] = 1;
-                                    znak[i, j] = 1;
-                                }
-                                dataGridView1[i, j].Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
-                                dataGridView1[j, i].Value = pixels[i, j];
-
-
-                            }
-
-                        }
+                        AddDataToDataGridView(GetBinaryArrayFromBitmap(firstBitmap));
                     }
-
-
-
 
                 }
             }
@@ -199,20 +128,19 @@ namespace EuclidImage
                 MessageBox.Show(ex.Message);
             }
             button2.Enabled = true;
-            button7.Enabled = true;
             button5.Enabled = true;
+            button8.Enabled = true;
 
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            button3.Enabled = true;
             chart1.Height = panel2.Height;
-            dataGridView1.Height = 25 * myBitmap.Height;
+            dataGridView1.Height = 25 * firstBitmap.Height;
             chart1.Location = new Point(chart1.Location.X, dataGridView1.Height + 20);
 
 
-            for (int i = 0; i < myBitmap.Width; i++)
+            for (int i = 0; i < firstBitmap.Width; i++)
             {
                 DataGridViewRow row2 = dataGridView1.Rows[i];
                 dataGridView1.Columns[i].Width = 50;
@@ -220,15 +148,15 @@ namespace EuclidImage
             dataGridView1.ScrollBars = ScrollBars.None;
 
 
-            var res = GetCalculateEwclidDistance(GetBitArray());
+            var res = GetCalculateEwclidDistance(GetBinaryArrayFromBitmap(firstBitmap));
 
             int k = 0;
 
-            for (int i = 0; i < myBitmap.Width; i++)
+            for (int i = 0; i < firstBitmap.Width; i++)
             {
-                for (int j = 0; j < myBitmap.Height; j++)
+                for (int j = 0; j < firstBitmap.Height; j++)
                 {
-                    if (znak[i, j] == 0)
+                    if (signsForGreyScaleBitmap[i, j] == 0)
                     {
                         dataGridView1[j, i].Value = res[k] * -1;
 
@@ -240,108 +168,39 @@ namespace EuclidImage
                     k++;
                 }
             }
-        }
 
-        private void button3_Click(object sender, EventArgs e)
-        {
-            button4.Enabled = true;
-            button8.Enabled = true;
             chart1.Series[0].Points.Clear();
             secondBitMap = CreateGrayscaleBitmap(secondBitMap);
-            button6.Enabled = true;
             pictureBox2.Show();
             pictureBox2.Image = secondBitMap;
             pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox2.Location = new Point(pictureBox1.Location.X, pictureBox1.Height + 15);
             pictureBox2.Width = secondBitMap.Width + 120;
             pictureBox2.Height = secondBitMap.Height + 120;
-
         }
-
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            SaveImg(secondBitMap);
-        }
-
-
-
 
         private void button5_Click(object sender, EventArgs e)
         {
-
-            //borderValues
-            double[,] borderValuesArr = new double[borderValues.GetLength(0), borderValues.GetLength(1)];
-
-            for (int i = 1; i < borderValues.GetLength(0) - 1; i++)
-            {
-                for (int j = 1; j < borderValues.GetLength(1) - 1; j++)
-                {
-                    var pixelValue = 255 - borderValues[i, j];
-                    if (pixelValue < borderValues[i - 1, j-1] 
-                        || pixelValue < borderValues[i - 1, j] 
-                        || pixelValue < borderValues[i - 1, j+ 1]
-                        || pixelValue < borderValues[i, j -1]
-                        || pixelValue < borderValues[i, j + 1]
-                        || pixelValue < borderValues[i + 1, j -1]
-                        || pixelValue < borderValues[i + 1, j]
-                        || pixelValue < borderValues[i + 1, j + 1])
-                    {
-                        borderValuesArr[j, i] = 1;
-                    }
-                    else
-                    {
-                        borderValuesArr[j, i] = 0;
-                    }
-                }
-            }
-
-
-            var bitmap = new Bitmap(myBitmap.Width, myBitmap.Height);
-
-            for (int i = 0; i < myBitmap.Width; i++)
-            {
-                for (int j = 0; j < myBitmap.Height; j++)
-                {
-                    
-                    if (borderValuesArr[i,j] == 0)
-                    {
-                        bitmap.SetPixel(i, j, Color.White);
-                    }
-                    else
-                    {
-                        bitmap.SetPixel(i, j, Color.Black);
-                    }
-                }
-            }
-
+            chart1.Series[0].Points.Clear();
+            double[,] avgValuesFromBitmap = GetAvgValuesFromGreyScaleBitmap(firstBitmap);
+            double[,] borderValuesArr = GetBorderValuesFromBitmap(firstBitmap, avgValuesFromBitmap);
+            var bitmap = new Bitmap(firstBitmap.Width, firstBitmap.Height);
+            GetBinaryBitmap(bitmap, borderValuesArr);
             pictureBox2.Show();
             pictureBox2.Image = bitmap;
             pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox2.Location = new Point(pictureBox1.Location.X, pictureBox1.Height + 15);
             pictureBox2.Width = bitmap.Width + 120;
             pictureBox2.Height = bitmap.Height + 120;
-        }
-
-        private void button6_Click(object sender, EventArgs e)
-        {
-            chart1.Series[0].Points.Clear();
-            pictureBox2.Image = CreateGrayscaleBitmap(secondBitMap);
-            pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
-            pictureBox2.Location = new Point(pictureBox1.Location.X, pictureBox1.Height + 15);
-            pictureBox2.Width = secondBitMap.Width + 120;
-            pictureBox2.Height = secondBitMap.Height + 120;
-        }
-
-        private void button7_Click(object sender, EventArgs e)
-        {
-            SaveImg(myBitmap);
+            var binaryValues = GetBinaryArrayFromBitmap(bitmap);
+            AddDataToDataGridView(binaryValues);
+            DrowGistogramm(binaryValues);
         }
 
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             colorDialog1 = new ColorDialog();
-            Bitmap newBmp = new Bitmap(myBitmap.Width, myBitmap.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap newBmp = new Bitmap(firstBitmap.Width, firstBitmap.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
             if (colorDialog1.ShowDialog() == DialogResult.OK)
             {
@@ -358,13 +217,13 @@ namespace EuclidImage
                         }
                         else
                         {
-                            newBmp.SetPixel(i, j, myBitmap.GetPixel(i, j));
+                            newBmp.SetPixel(i, j, firstBitmap.GetPixel(i, j));
                         }
 
                     }
                 }
-                myBitmap = newBmp;
-                pictureBox1.Image = myBitmap;
+                firstBitmap = newBmp;
+                pictureBox1.Image = firstBitmap;
             }
 
 
@@ -372,21 +231,21 @@ namespace EuclidImage
 
         private void button8_Click(object sender, EventArgs e)
         {
-            dataGridView1.Height = 25 * myBitmap.Height + 25;
+            dataGridView1.Height = 25 * firstBitmap.Height + 25;
             chart1.Height = chart1.Height - 25;
             chart1.Location = new Point(chart1.Location.X, dataGridView1.Height + 20);
             dataGridView1.ScrollBars = ScrollBars.Horizontal;
-            for (int i = 0; i < myBitmap.Width; i++)
+            for (int i = 0; i < firstBitmap.Width; i++)
             {
                 DataGridViewRow row2 = dataGridView1.Rows[i];
                 dataGridView1.Columns[i].Width = 120;
             }
             dataGridView1.ScrollBars = ScrollBars.Horizontal;
-            for (int i = 0; i < myBitmap.Width; i++)
+            for (int i = 0; i < firstBitmap.Width; i++)
             {
-                for (int j = 0; j < myBitmap.Height; j++)
+                for (int j = 0; j < firstBitmap.Height; j++)
                 {
-                    Color a = myBitmap.GetPixel(j, i);
+                    Color a = firstBitmap.GetPixel(j, i);
                     dataGridView1[j, i].Value = a.R + "-" + a.G + "-" + a.B;
 
                 }
@@ -397,9 +256,9 @@ namespace EuclidImage
         public List<double> GetCalculateEwclidDistance(double[,] pointss)
         {
             Dictionary<string, List<string>> indexes = new Dictionary<string, List<string>>();
-            for (int i = 0; i < myBitmap.Width; i++)
+            for (int i = 0; i < firstBitmap.Width; i++)
             {
-                for (int j = 0; j < myBitmap.Height; j++)
+                for (int j = 0; j < firstBitmap.Height; j++)
                 {
                     if (pointss[i, j] == 0)
                     {
@@ -435,8 +294,6 @@ namespace EuclidImage
             return result;
         }
 
-
-
         private List<string> GetIndex(int number, double[,] pointss)
         {
             int globalIForOne = 0;
@@ -447,9 +304,9 @@ namespace EuclidImage
             List<string> result = new List<string>();
             if (number == 1)
             {
-                for (int i = 0; i < myBitmap.Width; i++)
+                for (int i = 0; i < firstBitmap.Width; i++)
                 {
-                    for (int j = 0; j < myBitmap.Height; j++)
+                    for (int j = 0; j < firstBitmap.Height; j++)
                     {
                         if (pointss[i, j] == 1 && i >= globalIForOne && j >= globalJForOne)
                         {
@@ -463,9 +320,9 @@ namespace EuclidImage
             }
             if (number == 0)
             {
-                for (int i = 0; i < myBitmap.Width; i++)
+                for (int i = 0; i < firstBitmap.Width; i++)
                 {
-                    for (int j = 0; j < myBitmap.Height; j++)
+                    for (int j = 0; j < firstBitmap.Height; j++)
                     {
                         if (pointss[i, j] == 0 && i >= globalIForZero && j >= globalJForZero)
                         {
@@ -480,7 +337,6 @@ namespace EuclidImage
 
             return result;
         }
-
 
         public double Distance(double x1, double y1, double x2, double y2) => Math.Round(Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2)), 2);
 
@@ -502,34 +358,32 @@ namespace EuclidImage
             }
         }
 
-        private double[,] GetBitArray()
+        private double[,] GetBinaryArrayFromBitmap(Bitmap bitmap)
         {
-            var bmpWidth = myBitmap.Width;
-            var bmpHeight = myBitmap.Height;
-            int[,] pixels = new int[bmpWidth, bmpHeight];
-            double[,] res = new double[bmpWidth, bmpHeight];
+            signsForGreyScaleBitmap = new int[bitmap.Width, bitmap.Height];
+            double[,] binaryArray = new double[bitmap.Width, bitmap.Height];
 
-            for (int i = 0; i < bmpWidth; i++)
+            for (int i = 0; i < binaryArray.GetLength(0); i++)
             {
-                for (int j = 0; j < bmpHeight; j++)
+                for (int j = 0; j < binaryArray.GetLength(1); j++)
                 {
-                    Color a = myBitmap.GetPixel(j, i);
+                    Color a = bitmap.GetPixel(j, i);
                     if (a.R == 255 && a.G == 255 && a.B == 255)
                     {
-                        pixels[i, j] = 0;
+                        binaryArray[i, j] = 0;
+                        signsForGreyScaleBitmap[i, j] = 0;
                     }
                     else
                     {
-                        pixels[i, j] = 1;
+                        binaryArray[i, j] = 1;
+                        signsForGreyScaleBitmap[i, j] = 1;
                     }
-
-                    res[i, j] = pixels[i, j];
+                   
                 }
             }
 
-            return res;
+            return binaryArray;
         }
-
 
         private bool IsBinaryImage(Bitmap bitmap)
         {
@@ -558,7 +412,7 @@ namespace EuclidImage
         private Bitmap CreateGrayscaleBitmap(Bitmap secondBitMap)
         {
             chart1.Series[0].Points.Clear();
-            matr = new double[myBitmap.Width, myBitmap.Height];
+            matr = new double[firstBitmap.Width, firstBitmap.Height];
             for (int i = 0; i < dataGridView1.RowCount; i++)
             {
                 for (int j = 0; j < dataGridView1.ColumnCount; j++)
@@ -605,7 +459,7 @@ namespace EuclidImage
 
 
             int indexForColor = 255 / Count;
-            secondBitMap = new Bitmap(myBitmap.Width, myBitmap.Height);
+            secondBitMap = new Bitmap(firstBitmap.Width, firstBitmap.Height);
             Array.Sort(difColor);
             Array.Reverse(difColor);
             int position;
@@ -654,12 +508,12 @@ namespace EuclidImage
                 trackBar1.BackColor = SystemColors.GradientInactiveCaption;
             }
 
-            var changebleBitmap = new Bitmap(myBitmap.Width, myBitmap.Height);
+            var changebleBitmap = new Bitmap(firstBitmap.Width, firstBitmap.Height);
             for (int x = 0; x < changebleBitmap.Width; x++)
             {
                 for (int y = 0; y < changebleBitmap.Height; y++)
                 {
-                    Color color = myBitmap.GetPixel(x, y);
+                    Color color = firstBitmap.GetPixel(x, y);
                     int avgColor = (color.R + color.G + color.B) / 3;
                     if (avgColor > trackBar1.Value)
                     {
@@ -678,7 +532,6 @@ namespace EuclidImage
 
 
             secondBitMap = CreateGrayscaleBitmap(changebleBitmap);
-            button6.Enabled = true;
             pictureBox2.Show();
             pictureBox2.Image = secondBitMap;
             pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
@@ -688,6 +541,125 @@ namespace EuclidImage
 
 
             pictureBox2.Image = changebleBitmap;
+        }
+
+        private void DrowGistogramm(double[,] arr)
+        {
+            int count = 0;
+            Dictionary<double, double> rezul = new Dictionary<double, double>(); //считаем эл-ты в массиве
+            for (int i = 0; i < arr.GetLength(0); i++)
+            {
+                for (int j = 0; j < arr.GetLength(1); j++)
+                {
+                    if (rezul.ContainsKey(arr[i, j]))
+                    {
+                        rezul[arr[i, j]]++;
+                    }
+                    else
+                    {
+                        rezul.Add(arr[i, j], 1); count++;
+                    }
+                }
+
+            }
+
+            foreach (KeyValuePair<double, double> par in rezul)
+            {
+                chart1.Series[0].Points.AddXY(par.Key, par.Value);
+                chart1.Series[0].IsValueShownAsLabel = true;
+            }
+        }
+
+        private void AddDataToDataGridView(double[,] arr)
+        {
+            for (int i = 0; i < arr.GetLength(0); i++)
+            {
+                for (int j = 0; j < arr.GetLength(1); j++)
+                {
+                    dataGridView1[j, i].Value = arr[i, j];
+                }
+            }
+        }
+
+        private void GetBinaryBitmap(Bitmap bitmap, double [,] arr)
+        {
+            for (int i = 0; i < bitmap.Width; i++)
+            {
+                for (int j = 0; j < bitmap.Height; j++)
+                {
+
+                    if (arr[i, j] == 0)
+                    {
+                        bitmap.SetPixel(i, j, Color.White);
+
+                    }
+                    else
+                    {
+                        bitmap.SetPixel(i, j, Color.Black);
+
+                    }
+                }
+            }
+        }
+
+        private double[,] GetBorderValuesFromBitmap(Bitmap bitmap ,double[,] borderValues)
+        {
+            double[,] borderValuesArr = new double[bitmap.Width, bitmap.Height];
+
+            for (int i = 1; i < borderValues.GetLength(0) - 1; i++)
+            {
+                for (int j = 1; j < borderValues.GetLength(1) - 1; j++)
+                {
+                    var pixelValue = 255 - borderValues[i, j];
+                    if (pixelValue < borderValues[i - 1, j - 1]
+                        || pixelValue < borderValues[i - 1, j]
+                        || pixelValue < borderValues[i - 1, j + 1]
+                        || pixelValue < borderValues[i, j - 1]
+                        || pixelValue < borderValues[i, j + 1]
+                        || pixelValue < borderValues[i + 1, j - 1]
+                        || pixelValue < borderValues[i + 1, j]
+                        || pixelValue < borderValues[i + 1, j + 1])
+                    {
+                        borderValuesArr[j, i] = 1;
+
+                    }
+                    else
+                    {
+                        borderValuesArr[j, i] = 0;
+                    }
+                }
+            }
+
+            return borderValuesArr;
+        }
+
+        private double[,] GetAvgValuesFromGreyScaleBitmap(Bitmap bitmap)
+        {
+            double[,] pixels = new double[bitmap.Width, bitmap.Height];
+            for (int i = 0; i < bitmap.Width; i++)
+            {
+                for (int j = 0; j < bitmap.Height; j++)
+                {
+                    Color a = bitmap.GetPixel(j, i);
+                    int avgColor = (a.R + a.G + a.B) / 3;
+                    pixels[i, j] = 255 - avgColor;
+
+                }
+
+            }
+
+            return pixels;
+        }
+
+        private void pictureBox1_DoubleClick(object sender, EventArgs e)
+        {
+            SaveImg(firstBitmap);
+        }
+
+        private void pictureBox2_DoubleClick(object sender, EventArgs e)
+        {
+            SaveImg(secondBitMap);
+
         }
     }
 
