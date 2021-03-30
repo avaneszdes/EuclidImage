@@ -194,7 +194,7 @@ namespace EuclidImage
             pictureBox2.Height = bitmap.Height + 120;
             var binaryValues = GetBinaryArrayFromBitmap(bitmap);
             AddDataToDataGridView(binaryValues);
-            DrowGistogramm(binaryValues);
+            DrawGistogramm(binaryValues);
         }
 
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
@@ -354,6 +354,8 @@ namespace EuclidImage
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 string path = saveFileDialog1.FileName;
+
+
                 bitmap.Save(path);
             }
         }
@@ -531,7 +533,7 @@ namespace EuclidImage
             }
 
 
-            secondBitMap = CreateGrayscaleBitmap(changebleBitmap);
+            secondBitMap = changebleBitmap;
             pictureBox2.Show();
             pictureBox2.Image = secondBitMap;
             pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
@@ -540,10 +542,10 @@ namespace EuclidImage
             pictureBox2.Height = secondBitMap.Height + 120;
 
 
-            pictureBox2.Image = changebleBitmap;
+            pictureBox2.Image = secondBitMap;
         }
 
-        private void DrowGistogramm(double[,] arr)
+        private void DrawGistogramm(double[,] arr)
         {
             int count = 0;
             Dictionary<double, double> rezul = new Dictionary<double, double>(); //считаем эл-ты в массиве
@@ -600,6 +602,8 @@ namespace EuclidImage
                     }
                 }
             }
+
+            secondBitMap = bitmap;
         }
 
         private double[,] GetBorderValuesFromBitmap(Bitmap bitmap ,double[,] borderValues)
@@ -653,14 +657,36 @@ namespace EuclidImage
 
         private void pictureBox1_DoubleClick(object sender, EventArgs e)
         {
-            SaveImg(firstBitmap);
+            Bitmap bit = new Bitmap(firstBitmap.Width, firstBitmap.Height);
+
+            for (int i = 0; i < firstBitmap.Width; i++)
+            {
+                for (int j = 0; j < firstBitmap.Height; j++)
+                {
+                    bit.SetPixel(i, j, firstBitmap.GetPixel(i, j));
+                }
+
+            }
+            SaveImg(bit);
         }
 
         private void pictureBox2_DoubleClick(object sender, EventArgs e)
         {
-            SaveImg(secondBitMap);
+            Bitmap bit = new Bitmap(firstBitmap.Width, firstBitmap.Height);
+
+            for (int i = 0; i < firstBitmap.Width; i++)
+            {
+                for (int j = 0; j < firstBitmap.Height; j++)
+                {
+                    bit.SetPixel(i, j, secondBitMap.GetPixel(i, j));
+                }
+
+            }
+            SaveImg(bit);
 
         }
+
+        
     }
 
 }
