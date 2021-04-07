@@ -812,7 +812,7 @@ namespace EuclidImage
             dataGridView3[0, 3].Value = "3";
             dataGridView3[1, 3].Value = dataGridView2[1, 4].Value;
             dataGridView3[2, 3].Value = dataGridView2[2, 5].Value;
-            dataGridView3[3, 3].Value = dataGridView2[3, 5].Value; 
+            dataGridView3[3, 3].Value = dataGridView2[3, 5].Value;
             dataGridView3[0, 4].Value = "4";
             dataGridView3[1, 4].Value = dataGridView2[1, 5].Value;
             dataGridView3[2, 4].Value = dataGridView2[2, 5].Value;
@@ -826,24 +826,135 @@ namespace EuclidImage
             dataGridView3[2, 6].Value = dataGridView2[2, 5].Value;
             dataGridView3[3, 6].Value = dataGridView2[3, 4].Value;
             dataGridView3[0, 7].Value = "7";
-            dataGridView3[1, 7].Value = dataGridView2[1, 5].Value; 
+            dataGridView3[1, 7].Value = dataGridView2[1, 5].Value;
             dataGridView3[2, 7].Value = dataGridView2[2, 4].Value;
-            dataGridView3[3, 7].Value = dataGridView2[3, 5].Value; 
+            dataGridView3[3, 7].Value = dataGridView2[3, 5].Value;
             dataGridView3[0, 8].Value = "8";
-            dataGridView3[1, 8].Value = dataGridView2[1, 5].Value; 
+            dataGridView3[1, 8].Value = dataGridView2[1, 5].Value;
             dataGridView3[2, 8].Value = dataGridView2[2, 4].Value;
             dataGridView3[3, 8].Value = dataGridView2[3, 4].Value;
 
+            double[,] valuesForGistagramm = new double[firstBitmap.Width, firstBitmap.Height];
+            for (int i = 0; i < firstBitmap.Width; i++)
+            {
+                for (int j = 0; j < firstBitmap.Height; j++)
+                {
+                    var minR = firstBitmap.GetPixel(i, j).R;
+                    var minG = firstBitmap.GetPixel(i, j).G;
+                    var minB = firstBitmap.GetPixel(i, j).B;
+                    int[] arrR = new int[8];
+                    for (int k = 0; k < 8; k++)
+                    {
+                        arrR[k] = int.Parse(dataGridView3[1, k + 1].Value.ToString());
+                    }
+                    int[] arrG = new int[8];
+                    for (int k = 0; k < 8; k++)
+                    {
+                        arrG[k] = int.Parse(dataGridView3[2, k + 1].Value.ToString());
+                    }
+                    int[] arrB = new int[8];
+                    for (int k = 0; k < 8; k++)
+                    {
+                        arrB[k] = int.Parse(dataGridView3[3, k + 1].Value.ToString());
+                    }
+
+                                                                            
+                    dataGridView1[j, i].Value = GetRowIndexFromDataGridView3(GetColorValuesFromDataGridView3(minR, arrR),
+                                                                            GetColorValuesFromDataGridView3(minG, arrG), 
+                                                                            GetColorValuesFromDataGridView3(minB, arrB));
+                    valuesForGistagramm[i, j] = double.Parse(dataGridView1[j, i].Value.ToString());
+                }
+            }
 
 
+            Bitmap bitmap = new Bitmap(firstBitmap.Width, firstBitmap.Height);
+
+            for (int i = 0; i < firstBitmap.Width; i++)
+            {
+                for (int j = 0; j < firstBitmap.Height; j++)
+                {
+
+                    if(int.Parse(dataGridView1[j,i].Value.ToString()) == 1)
+                    {
+                        Color c = Color.FromArgb(int.Parse(dataGridView3[1, 1].Value.ToString()), int.Parse(dataGridView3[2, 1].Value.ToString()), int.Parse(dataGridView3[3, 1].Value.ToString()));
+                        bitmap.SetPixel(i, j, c);
+                    }
+                    else if (int.Parse(dataGridView1[j, i].Value.ToString()) == 2)
+                    {
+                        Color c = Color.FromArgb(int.Parse(dataGridView3[1, 2].Value.ToString()), int.Parse(dataGridView3[2, 2].Value.ToString()), int.Parse(dataGridView3[3, 2].Value.ToString()));
+                        bitmap.SetPixel(i, j, c);
+                    }
+                    else if (int.Parse(dataGridView1[j, i].Value.ToString()) == 3)
+                    {
+                        Color c = Color.FromArgb(int.Parse(dataGridView3[1, 3].Value.ToString()), int.Parse(dataGridView3[2, 3].Value.ToString()), int.Parse(dataGridView3[3, 3].Value.ToString()));
+                        bitmap.SetPixel(i, j, c);
+                    }
+                    else if (int.Parse(dataGridView1[j, i].Value.ToString()) == 4)
+                    {
+                        Color c = Color.FromArgb(int.Parse(dataGridView3[1, 4].Value.ToString()), int.Parse(dataGridView3[2, 4].Value.ToString()), int.Parse(dataGridView3[3, 4].Value.ToString()));
+                        bitmap.SetPixel(i, j, c);
+                    }
+                    else if (int.Parse(dataGridView1[j, i].Value.ToString()) == 5)
+                    {
+                        Color c = Color.FromArgb(int.Parse(dataGridView3[1, 5].Value.ToString()), int.Parse(dataGridView3[2, 5].Value.ToString()), int.Parse(dataGridView3[3, 5].Value.ToString()));
+                        bitmap.SetPixel(i, j, c);
+                    }
+                    else if (int.Parse(dataGridView1[j, i].Value.ToString()) == 6)
+                    {
+                        Color c = Color.FromArgb(int.Parse(dataGridView3[1, 6].Value.ToString()), int.Parse(dataGridView3[2, 6].Value.ToString()), int.Parse(dataGridView3[3, 6].Value.ToString()));
+                        bitmap.SetPixel(i, j, c);
+                    }
+                    else if (int.Parse(dataGridView1[j, i].Value.ToString()) == 7)
+                    {
+                        Color c = Color.FromArgb(int.Parse(dataGridView3[1, 7].Value.ToString()), int.Parse(dataGridView3[2, 7].Value.ToString()), int.Parse(dataGridView3[3, 7].Value.ToString()));
+                        bitmap.SetPixel(i, j, c);
+                    }
+                    else if (int.Parse(dataGridView1[j, i].Value.ToString()) == 8)
+                    {
+                        Color c = Color.FromArgb(int.Parse(dataGridView3[1, 8].Value.ToString()), int.Parse(dataGridView3[2, 8].Value.ToString()), int.Parse(dataGridView3[3, 8].Value.ToString()));
+                        bitmap.SetPixel(i, j, c);
+                    }
+
+                }
+            }
 
 
+            secondBitMap = bitmap;
+            pictureBox2.Show();
+            pictureBox2.Image = secondBitMap;
+            pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBox2.Location = new Point(pictureBox1.Location.X, pictureBox1.Height + 15);
+            pictureBox2.Width = secondBitMap.Width + 120;
+            pictureBox2.Height = secondBitMap.Height + 120;
 
-
-
-
-
+            DrawGistogramm(valuesForGistagramm);
         }
+
+
+        private int GetColorValuesFromDataGridView3(int colorValue, int[] arr)
+        {
+
+            return arr.OrderBy(v => Math.Abs((long)v - colorValue)).First();
+        }
+
+
+        private int GetRowIndexFromDataGridView3(int r, int g, int b)
+        {
+
+            for (int i = 0; i < 8; i++)
+            {
+                if (r == int.Parse(dataGridView3[1, i + 1].Value.ToString()) && 
+                    g == int.Parse(dataGridView3[2, i + 1].Value.ToString()) && 
+                    b == int.Parse(dataGridView3[3, i + 1].Value.ToString()))
+                {
+                    return i + 1;
+                }
+            }
+
+            return 0;
+        }
+
+
     }
 
 }
