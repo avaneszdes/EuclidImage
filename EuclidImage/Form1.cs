@@ -84,7 +84,7 @@ namespace EuclidImage
                     this.Width = firstBitmap.Width + 160 + dataGridView1.Width + trackBar1.Width + 3;
                     this.Height = dataGridView1.Height + panel2.Height + 65;
 
-                    chart1.Width = dataGridView1.Width + trackBar1.Width +3;
+                    chart1.Width = dataGridView1.Width + trackBar1.Width + 3;
                     chart1.Height = panel2.Height;
 
                     dataGridView1.Location = new Point(pictureBox1.Width + 20 + trackBar1.Width + 6, dataGridView1.Location.Y);
@@ -130,6 +130,8 @@ namespace EuclidImage
             button2.Enabled = true;
             button5.Enabled = true;
             button8.Enabled = true;
+            button3.Enabled = true;
+            button4.Enabled = true;
 
         }
 
@@ -255,43 +257,51 @@ namespace EuclidImage
 
         public List<double> GetCalculateEwclidDistance(double[,] pointss)
         {
-            Dictionary<string, List<string>> indexes = new Dictionary<string, List<string>>();
-            for (int i = 0; i < firstBitmap.Width; i++)
+            try
             {
-                for (int j = 0; j < firstBitmap.Height; j++)
+                Dictionary<string, List<string>> indexes = new Dictionary<string, List<string>>();
+                for (int i = 0; i < firstBitmap.Width; i++)
                 {
-                    if (pointss[i, j] == 0)
+                    for (int j = 0; j < firstBitmap.Height; j++)
                     {
-                        indexes.Add(i + "," + j, GetIndex(1, pointss));
-                    }
-                    if (pointss[i, j] == 1)
-                    {
-                        indexes.Add(i + "," + j, GetIndex(0, pointss));
+                        if (pointss[i, j] == 0)
+                        {
+                            indexes.Add(i + "," + j, GetIndex(1, pointss));
+                        }
+                        if (pointss[i, j] == 1)
+                        {
+                            indexes.Add(i + "," + j, GetIndex(0, pointss));
+                        }
                     }
                 }
-            }
 
-            List<double> result = new List<double>();
-            foreach (var item in indexes)
-            {
-                var itemArray = item.Key.Split(',').ToArray();
-                var itemValues = item.Value.Select(x => x.Split(',').ToArray()).ToArray();
-                List<double> res = new List<double>();
-
-                for (int i = 0; i < itemValues.Length; i++)
+                List<double> result = new List<double>();
+                foreach (var item in indexes)
                 {
-                    var a = itemValues[i][0];
-                    var b = itemValues[i][1];
-                    var c = itemArray[0];
-                    var d = itemArray[1];
+                    var itemArray = item.Key.Split(',').ToArray();
+                    var itemValues = item.Value.Select(x => x.Split(',').ToArray()).ToArray();
+                    List<double> res = new List<double>();
 
-                    res.Add(Distance(double.Parse(itemArray[0]), double.Parse(itemArray[1]), double.Parse(itemValues[i][0]), double.Parse(itemValues[i][1])));
+                    for (int i = 0; i < itemValues.Length; i++)
+                    {
+                        var a = itemValues[i][0];
+                        var b = itemValues[i][1];
+                        var c = itemArray[0];
+                        var d = itemArray[1];
+
+                        res.Add(Distance(double.Parse(itemArray[0]), double.Parse(itemArray[1]), double.Parse(itemValues[i][0]), double.Parse(itemValues[i][1])));
+                    }
+
+                    result.Add(res.Min());
                 }
-
-                result.Add(res.Min());
+                return result;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
             }
 
-            return result;
+            return null;
         }
 
         private List<string> GetIndex(int number, double[,] pointss)
@@ -380,7 +390,7 @@ namespace EuclidImage
                         binaryArray[i, j] = 1;
                         signsForGreyScaleBitmap[i, j] = 1;
                     }
-                   
+
                 }
             }
 
@@ -583,7 +593,7 @@ namespace EuclidImage
             }
         }
 
-        private void GetBinaryBitmap(Bitmap bitmap, double [,] arr)
+        private void GetBinaryBitmap(Bitmap bitmap, double[,] arr)
         {
             for (int i = 0; i < bitmap.Width; i++)
             {
@@ -606,23 +616,27 @@ namespace EuclidImage
             secondBitMap = bitmap;
         }
 
-        private double[,] GetBorderValuesFromBitmap(Bitmap bitmap ,double[,] borderValues)
+        private double[,] GetBorderValuesFromBitmap(Bitmap bitmap, double[,] borderValues)
         {
             double[,] borderValuesArr = new double[bitmap.Width, bitmap.Height];
 
+            List<double> tempList = new List<double>();
+            for (int i = 0; i < bitmap.Width; i++)
+            {
+                for (int j = 0; j < bitmap.Height; j++)
+                {
+                    tempList.Add(borderValues[i, j]);
+                }
+            }
+
+            var avgValue = tempList.Average();
+            //button1.Text = avgValue.ToString();
             for (int i = 1; i < borderValues.GetLength(0) - 1; i++)
             {
                 for (int j = 1; j < borderValues.GetLength(1) - 1; j++)
                 {
                     var pixelValue = 255 - borderValues[i, j];
-                    if (pixelValue < borderValues[i - 1, j - 1]
-                        || pixelValue < borderValues[i - 1, j]
-                        || pixelValue < borderValues[i - 1, j + 1]
-                        || pixelValue < borderValues[i, j - 1]
-                        || pixelValue < borderValues[i, j + 1]
-                        || pixelValue < borderValues[i + 1, j - 1]
-                        || pixelValue < borderValues[i + 1, j]
-                        || pixelValue < borderValues[i + 1, j + 1])
+                    if (pixelValue < avgValue)
                     {
                         borderValuesArr[j, i] = 1;
 
@@ -686,7 +700,150 @@ namespace EuclidImage
 
         }
 
-        
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Bitmap bitmap = new Bitmap(firstBitmap.Width, firstBitmap.Height);
+
+            for (int i = 0; i < firstBitmap.Width; i++)
+            {
+                for (int j = 0; j < firstBitmap.Height; j++)
+                {
+                    var avg = int.Parse(dataGridView1[j, i].Value.ToString());
+                    Color c = Color.FromArgb(avg, avg, avg);
+                    bitmap.SetPixel(i, j, c);
+                }
+            }
+
+
+            secondBitMap = bitmap;
+            pictureBox2.Show();
+            pictureBox2.Image = secondBitMap;
+            pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBox2.Location = new Point(pictureBox1.Location.X, pictureBox1.Height + 15);
+            pictureBox2.Width = secondBitMap.Width + 120;
+            pictureBox2.Height = secondBitMap.Height + 120;
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            dataGridView2.Rows.Add(6);
+            for (int i = 0; i < 4; i++)
+            {
+                DataGridViewRow row2 = dataGridView2.Rows[i];
+                dataGridView2.Columns[i].Width = 80;
+            }
+            dataGridView2.Width = 4 * 80;
+            dataGridView2.Height = 30 * 5;
+            dataGridView2.Location = new Point(dataGridView1.Location.X + dataGridView1.Width + 10, dataGridView1.Location.Y);
+            this.Width = this.Width + dataGridView2.Width + 12;
+            List<int> R = new List<int>();
+            List<int> G = new List<int>();
+            List<int> B = new List<int>();
+            for (int i = 0; i < firstBitmap.Width; i++)
+            {
+                for (int j = 0; j < firstBitmap.Height; j++)
+                {
+                    var color = firstBitmap.GetPixel(i, j);
+                    R.Add(color.R);
+                    G.Add(color.G);
+                    B.Add(color.B);
+                }
+            }
+
+            int avgR = ((R.Max() - R.Min()) / 2) + R.Min();
+            int avgG = ((G.Max() - G.Min()) / 2) + G.Min();
+            int avgB = ((B.Max() - B.Min()) / 2) + B.Min();
+
+            dataGridView2[1, 0].Value = "R";
+            dataGridView2[1, 0].Style.BackColor = Color.Red;
+            dataGridView2[2, 0].Value = "G";
+            dataGridView2[2, 0].Style.BackColor = Color.Green;
+            dataGridView2[3, 0].Value = "B";
+            dataGridView2[3, 0].Style.BackColor = Color.Blue;
+            dataGridView2[0, 1].Value = "Min";
+            dataGridView2[1, 1].Value = R.Min();
+            dataGridView2[2, 1].Value = G.Min();
+            dataGridView2[3, 1].Value = B.Min();
+            dataGridView2[0, 2].Value = "Max";
+            dataGridView2[1, 2].Value = R.Max();
+            dataGridView2[2, 2].Value = G.Max();
+            dataGridView2[3, 2].Value = B.Max();
+            dataGridView2[0, 3].Value = "Avg";
+            dataGridView2[1, 3].Value = avgR;
+            dataGridView2[2, 3].Value = avgG;
+            dataGridView2[3, 3].Value = avgB;
+            dataGridView2[0, 4].Value = "Color1";
+            dataGridView2[1, 4].Value = ((R.Max() - R.Min()) / 4) + R.Min();
+            dataGridView2[2, 4].Value = ((G.Max() - G.Min()) / 4) + G.Min();
+            dataGridView2[3, 4].Value = ((B.Max() - B.Min()) / 4) + B.Min();
+            dataGridView2[0, 5].Value = "Color2";
+            dataGridView2[1, 5].Value = ((R.Max() - avgR) / 2) + avgR;
+            dataGridView2[2, 5].Value = ((G.Max() - avgG) / 2) + avgG;
+            dataGridView2[3, 5].Value = ((B.Max() - avgB) / 2) + avgB;
+
+
+            dataGridView3.Rows.Add(9);
+            for (int i = 0; i < 4; i++)
+            {
+                DataGridViewRow row3 = dataGridView3.Rows[i];
+                dataGridView3.Columns[i].Width = 80;
+            }
+            dataGridView3.Width = 4 * 80;
+            dataGridView3.Height = (30 * 8) - 11;
+
+
+
+            dataGridView3.Location = new Point(dataGridView1.Location.X + dataGridView1.Width + 10, dataGridView1.Location.Y + dataGridView2.Height + 10);
+
+            dataGridView3[1, 0].Value = "R";
+            dataGridView3[1, 0].Style.BackColor = Color.Red;
+            dataGridView3[2, 0].Value = "G";
+            dataGridView3[2, 0].Style.BackColor = Color.Green;
+            dataGridView3[3, 0].Value = "B";
+            dataGridView3[3, 0].Style.BackColor = Color.Blue;
+            dataGridView3[0, 1].Value = "1";
+            dataGridView3[1, 1].Value = dataGridView2[1, 4].Value;
+            dataGridView3[2, 1].Value = dataGridView2[2, 4].Value;
+            dataGridView3[3, 1].Value = dataGridView2[3, 4].Value;
+            dataGridView3[0, 2].Value = "2";
+            dataGridView3[1, 2].Value = dataGridView2[1, 4].Value;
+            dataGridView3[2, 2].Value = dataGridView2[2, 4].Value;
+            dataGridView3[3, 2].Value = dataGridView2[3, 5].Value;
+            dataGridView3[0, 3].Value = "3";
+            dataGridView3[1, 3].Value = dataGridView2[1, 4].Value;
+            dataGridView3[2, 3].Value = dataGridView2[2, 5].Value;
+            dataGridView3[3, 3].Value = dataGridView2[3, 5].Value; 
+            dataGridView3[0, 4].Value = "4";
+            dataGridView3[1, 4].Value = dataGridView2[1, 5].Value;
+            dataGridView3[2, 4].Value = dataGridView2[2, 5].Value;
+            dataGridView3[3, 4].Value = dataGridView2[3, 5].Value;
+            dataGridView3[0, 5].Value = "5";
+            dataGridView3[1, 5].Value = dataGridView2[1, 5].Value;
+            dataGridView3[2, 5].Value = dataGridView2[2, 5].Value;
+            dataGridView3[3, 5].Value = dataGridView2[3, 4].Value;
+            dataGridView3[0, 6].Value = "6";
+            dataGridView3[1, 6].Value = dataGridView2[1, 4].Value;
+            dataGridView3[2, 6].Value = dataGridView2[2, 5].Value;
+            dataGridView3[3, 6].Value = dataGridView2[3, 4].Value;
+            dataGridView3[0, 7].Value = "7";
+            dataGridView3[1, 7].Value = dataGridView2[1, 5].Value; 
+            dataGridView3[2, 7].Value = dataGridView2[2, 4].Value;
+            dataGridView3[3, 7].Value = dataGridView2[3, 5].Value; 
+            dataGridView3[0, 8].Value = "8";
+            dataGridView3[1, 8].Value = dataGridView2[1, 5].Value; 
+            dataGridView3[2, 8].Value = dataGridView2[2, 4].Value;
+            dataGridView3[3, 8].Value = dataGridView2[3, 4].Value;
+
+
+
+
+
+
+
+
+
+
+        }
     }
 
 }

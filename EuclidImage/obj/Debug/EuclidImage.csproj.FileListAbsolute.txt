@@ -28,3 +28,18 @@ C:\Users\Vladislav\Source\Repos\EuclidImage3\EuclidImage\obj\Debug\EuclidImage.c
 C:\Users\Vladislav\Source\Repos\EuclidImage3\EuclidImage\obj\Debug\EuclidImage.csproj.CopyComplete
 C:\Users\Vladislav\Source\Repos\EuclidImage3\EuclidImage\obj\Debug\EuclidImage.exe
 C:\Users\Vladislav\Source\Repos\EuclidImage3\EuclidImage\obj\Debug\EuclidImage.pdb
+C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\bin\Debug\EuclidImage.exe.config
+C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\bin\Debug\EuclidImage.exe
+C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\bin\Debug\EuclidImage.pdb
+C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\bin\Debug\ImageProcessor.dll
+C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\bin\Debug\System.ValueTuple.dll
+C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\bin\Debug\ImageProcessor.xml
+C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\bin\Debug\System.ValueTuple.xml
+C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\obj\Debug\EuclidImage.csprojAssemblyReference.cache
+C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\obj\Debug\EuclidImage.Form1.resources
+C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\obj\Debug\EuclidImage.Properties.Resources.resources
+C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\obj\Debug\EuclidImage.csproj.GenerateResource.cache
+C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\obj\Debug\EuclidImage.csproj.CoreCompileInputs.cache
+C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\obj\Debug\EuclidImage.csproj.CopyComplete
+C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\obj\Debug\EuclidImage.exe
+C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\obj\Debug\EuclidImage.pdb
