@@ -20,6 +20,7 @@ namespace EuclidImage
             this.Width = panel2.Width + 25;
             this.Height = panel2.Height + 50;
             chart1.ChartAreas[0].AxisX.Interval = 0.1;
+            button6.Enabled = false;
 
         }
 
@@ -109,17 +110,24 @@ namespace EuclidImage
                         DataGridViewRow row2 = dataGridView1.Rows[i];
                         dataGridView1.Columns[i].Width = 50;
                     }
-                    var isBinaryImage = IsBinaryImage(firstBitmap);
 
 
-                    if (!isBinaryImage)
+                    if (IsBinaryImage(firstBitmap))
                     {
-                        AddDataToDataGridView(GetAvgValuesFromGreyScaleBitmap(firstBitmap));
+                        AddDataToDataGridView(GetBinaryArrayFromBitmap(firstBitmap));
+                       
+                        
+                    }
+                    else if(IsGrayScaleImage(firstBitmap))
+                    {
+                        AddDataToDataGridView(GetAvgValuesForFourthLab(firstBitmap));
+                        
                     }
                     else
                     {
-                        AddDataToDataGridView(GetBinaryArrayFromBitmap(firstBitmap));
+                        AddDataToDataGridView(GetAvgValuesFromGreyScaleBitmap(firstBitmap));
                     }
+
 
                 }
             }
@@ -132,6 +140,7 @@ namespace EuclidImage
             button8.Enabled = true;
             button3.Enabled = true;
             button4.Enabled = true;
+            button6.Enabled = true;
 
         }
 
@@ -214,7 +223,7 @@ namespace EuclidImage
                         if (e.RowIndex == j && i == e.ColumnIndex)
                         {
                             newBmp.SetPixel(e.ColumnIndex, e.RowIndex, colorDialog1.Color);
-                            dataGridView1[i, j].Value = colorDialog1.Color.R + "-" + colorDialog1.Color.G + "-" + colorDialog1.Color.B;
+                            dataGridView1[i, j].Value = (colorDialog1.Color.R + colorDialog1.Color.G + colorDialog1.Color.B) / 3;
                             dataGridView1.Update();
                         }
                         else
@@ -233,9 +242,6 @@ namespace EuclidImage
 
         private void button8_Click(object sender, EventArgs e)
         {
-            dataGridView1.Height = 25 * firstBitmap.Height + 25;
-            chart1.Height = chart1.Height - 25;
-            chart1.Location = new Point(chart1.Location.X, dataGridView1.Height + 20);
             dataGridView1.ScrollBars = ScrollBars.Horizontal;
             for (int i = 0; i < firstBitmap.Width; i++)
             {
@@ -249,9 +255,7 @@ namespace EuclidImage
                 {
                     Color a = firstBitmap.GetPixel(j, i);
                     dataGridView1[j, i].Value = a.R + "-" + a.G + "-" + a.B;
-
                 }
-
             }
         }
 
@@ -397,6 +401,22 @@ namespace EuclidImage
             return binaryArray;
         }
 
+
+        private double[,] GetGrayscaleArrayFromBitmap(Bitmap bitmap)
+        {
+            double[,] binaryArray = new double[bitmap.Width, bitmap.Height];
+
+            for (int i = 0; i < binaryArray.GetLength(0); i++)
+            {
+                for (int j = 0; j < binaryArray.GetLength(1); j++)
+                {
+                    binaryArray[i, j] = (bitmap.GetPixel(i, j).R + bitmap.GetPixel(i, j).B + bitmap.GetPixel(i, j).B) / 3;
+                }
+            }
+
+            return binaryArray;
+        }
+
         private bool IsBinaryImage(Bitmap bitmap)
         {
             var arr = new int[bitmap.Width * bitmap.Height];
@@ -419,6 +439,25 @@ namespace EuclidImage
             }
 
             return !arr.Contains(1);
+        }
+
+
+        private bool IsGrayScaleImage(Bitmap bitmap)
+        {
+            for (int i = 0; i < bitmap.Width; i++)
+            {
+                for (int j = 0; j < bitmap.Height; j++)
+                {
+                    var pixel = bitmap.GetPixel(i, j);
+                    var pixelColor = (pixel.R + pixel.G + pixel.B) / 3;
+                    if (pixelColor != pixel.R && pixelColor !=  pixel.G && pixelColor != pixel.B)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         private Bitmap CreateGrayscaleBitmap(Bitmap secondBitMap)
@@ -557,7 +596,9 @@ namespace EuclidImage
 
         private void DrawGistogramm(double[,] arr)
         {
+            chart1.Series[0].Points.Clear();
             int count = 0;
+
             Dictionary<double, double> rezul = new Dictionary<double, double>(); //считаем эл-ты в массиве
             for (int i = 0; i < arr.GetLength(0); i++)
             {
@@ -578,8 +619,10 @@ namespace EuclidImage
             foreach (KeyValuePair<double, double> par in rezul)
             {
                 chart1.Series[0].Points.AddXY(par.Key, par.Value);
-                chart1.Series[0].IsValueShownAsLabel = true;
+                
             }
+            chart1.Series[0].IsValueShownAsLabel = true;
+
         }
 
         private void AddDataToDataGridView(double[,] arr)
@@ -669,6 +712,44 @@ namespace EuclidImage
             return pixels;
         }
 
+
+        private double[,] GetAvgValuesForFourthLab(Bitmap bitmap)
+        {
+            double[,] pixels = new double[bitmap.Width, bitmap.Height];
+            for (int i = 0; i < bitmap.Width; i++)
+            {
+                for (int j = 0; j < bitmap.Height; j++)
+                {
+                    Color a = bitmap.GetPixel(j, i);
+                    pixels[i, j] = (a.R + a.G + a.B) / 3;
+                }
+
+            }
+
+            return pixels;
+        }
+
+        private double[,] GetAvgPorog(double [,] pixels)
+        {
+
+            double[,] res = new double[pixels.GetLength(0), pixels.GetLength(1)];
+
+            for (int i = 1; i < res.GetLength(0) - 1; i++)
+            {
+                for (int j = 1; j < res.GetLength(1) - 1; j++)
+                {
+                    double temp = Math.Abs(pixels[i, j] - ((pixels[i, j] + pixels[i - 1, j - 1] + pixels[i - 1, j] + pixels[i - 1, j + 1] + pixels[i, j - 1] + pixels[i, j + 1] + pixels[i + 1, j - 1] + pixels[i + 1, j + 1] + pixels[i + 1, j]) / 9));
+                    res[i - 1, j - 1] = temp;
+                    if (double.Parse(textBox1.Text) < temp)
+                    {
+                        res[i - 1, j - 1] = (pixels[i, j] + pixels[i - 1, j - 1] + pixels[i - 1, j] + pixels[i - 1, j + 1] + pixels[i, j - 1] + pixels[i, j + 1] + pixels[i + 1, j - 1] + pixels[i + 1, j + 1] + pixels[i + 1, j]) / 9;
+                    }
+                }
+            }
+
+            return res;
+        }
+
         private void pictureBox1_DoubleClick(object sender, EventArgs e)
         {
             Bitmap bit = new Bitmap(firstBitmap.Width, firstBitmap.Height);
@@ -702,13 +783,14 @@ namespace EuclidImage
 
         private void button3_Click(object sender, EventArgs e)
         {
+
             Bitmap bitmap = new Bitmap(firstBitmap.Width, firstBitmap.Height);
 
             for (int i = 0; i < firstBitmap.Width; i++)
             {
                 for (int j = 0; j < firstBitmap.Height; j++)
                 {
-                    var avg = int.Parse(dataGridView1[j, i].Value.ToString());
+                    var avg = int.Parse(dataGridView1[i, j].Value.ToString());
                     Color c = Color.FromArgb(avg, avg, avg);
                     bitmap.SetPixel(i, j, c);
                 }
@@ -722,6 +804,10 @@ namespace EuclidImage
             pictureBox2.Location = new Point(pictureBox1.Location.X, pictureBox1.Height + 15);
             pictureBox2.Width = secondBitMap.Width + 120;
             pictureBox2.Height = secondBitMap.Height + 120;
+            AddDataToDataGridView(GetAvgValuesFromGreyScaleBitmap(secondBitMap));
+            DrawGistogramm(GetGrayscaleArrayFromBitmap(secondBitMap));
+
+
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -858,9 +944,9 @@ namespace EuclidImage
                         arrB[k] = int.Parse(dataGridView3[3, k + 1].Value.ToString());
                     }
 
-                                                                            
+
                     dataGridView1[j, i].Value = GetRowIndexFromDataGridView3(GetColorValuesFromDataGridView3(minR, arrR),
-                                                                            GetColorValuesFromDataGridView3(minG, arrG), 
+                                                                            GetColorValuesFromDataGridView3(minG, arrG),
                                                                             GetColorValuesFromDataGridView3(minB, arrB));
                     valuesForGistagramm[i, j] = double.Parse(dataGridView1[j, i].Value.ToString());
                 }
@@ -874,7 +960,7 @@ namespace EuclidImage
                 for (int j = 0; j < firstBitmap.Height; j++)
                 {
 
-                    if(int.Parse(dataGridView1[j,i].Value.ToString()) == 1)
+                    if (int.Parse(dataGridView1[j, i].Value.ToString()) == 1)
                     {
                         Color c = Color.FromArgb(int.Parse(dataGridView3[1, 1].Value.ToString()), int.Parse(dataGridView3[2, 1].Value.ToString()), int.Parse(dataGridView3[3, 1].Value.ToString()));
                         bitmap.SetPixel(i, j, c);
@@ -943,8 +1029,8 @@ namespace EuclidImage
 
             for (int i = 0; i < 8; i++)
             {
-                if (r == int.Parse(dataGridView3[1, i + 1].Value.ToString()) && 
-                    g == int.Parse(dataGridView3[2, i + 1].Value.ToString()) && 
+                if (r == int.Parse(dataGridView3[1, i + 1].Value.ToString()) &&
+                    g == int.Parse(dataGridView3[2, i + 1].Value.ToString()) &&
                     b == int.Parse(dataGridView3[3, i + 1].Value.ToString()))
                 {
                     return i + 1;
@@ -954,7 +1040,41 @@ namespace EuclidImage
             return 0;
         }
 
+        private void button6_Click(object sender, EventArgs e)
+        {
+            chart1.Series[0].Points.Clear();
+            var arr = GetAvgPorog(GetAvgValuesForFourthLab(firstBitmap));
+            var arr2 = GetAvgValuesForFourthLab(firstBitmap);
+            double[,] arr3 = new double[firstBitmap.Width, firstBitmap.Height];
 
+            Bitmap bitmap = new Bitmap(firstBitmap.Width, firstBitmap.Height);
+
+            for (int i = 0; i < arr.GetLength(0); i++)
+            {
+                for (int j = 0; j < arr.GetLength(0); j++)
+                {
+                    int avg = (int)arr[i,j];
+                    Color c = Color.FromArgb(avg, avg, avg);
+                    bitmap.SetPixel(j, i, c);
+                    arr3[i, j] = Math.Abs(arr[i, j] - arr2[i, j]);
+                }
+            }
+
+            var form2 = new Form2(arr);
+            form2.Show();
+            var form3 = new Form2(arr3);
+            form3.Show();
+
+
+            secondBitMap = bitmap;
+            pictureBox2.Show();
+            pictureBox2.Image = secondBitMap;
+            pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBox2.Location = new Point(pictureBox1.Location.X, pictureBox1.Height + 15);
+            pictureBox2.Width = secondBitMap.Width + 120;
+            pictureBox2.Height = secondBitMap.Height + 120;
+            DrawGistogramm(GetGrayscaleArrayFromBitmap(bitmap));
+        }
     }
 
 }

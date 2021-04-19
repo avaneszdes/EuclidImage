@@ -43,3 +43,4 @@ C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\obj\Debug\Eucli
 C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\obj\Debug\EuclidImage.csproj.CopyComplete
 C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\obj\Debug\EuclidImage.exe
 C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\obj\Debug\EuclidImage.pdb
+C:\Users\Vladislav Avanesov\Source\Repos\EuclidImage\EuclidImage\obj\Debug\EuclidImage.Form2.resources
