@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
+
 namespace EuclidImage
 {
     public partial class Form1 : Form
@@ -115,13 +116,13 @@ namespace EuclidImage
                     if (IsBinaryImage(firstBitmap))
                     {
                         AddDataToDataGridView(GetBinaryArrayFromBitmap(firstBitmap));
-                       
-                        
+
+
                     }
-                    else if(IsGrayScaleImage(firstBitmap))
+                    else if (IsGrayScaleImage(firstBitmap))
                     {
                         AddDataToDataGridView(GetAvgValuesForFourthLab(firstBitmap));
-                        
+
                     }
                     else
                     {
@@ -450,7 +451,7 @@ namespace EuclidImage
                 {
                     var pixel = bitmap.GetPixel(i, j);
                     var pixelColor = (pixel.R + pixel.G + pixel.B) / 3;
-                    if (pixelColor != pixel.R && pixelColor !=  pixel.G && pixelColor != pixel.B)
+                    if (pixelColor != pixel.R && pixelColor != pixel.G && pixelColor != pixel.B)
                     {
                         return false;
                     }
@@ -619,7 +620,7 @@ namespace EuclidImage
             foreach (KeyValuePair<double, double> par in rezul)
             {
                 chart1.Series[0].Points.AddXY(par.Key, par.Value);
-                
+
             }
             chart1.Series[0].IsValueShownAsLabel = true;
 
@@ -713,42 +714,9 @@ namespace EuclidImage
         }
 
 
-        private double[,] GetAvgValuesForFourthLab(Bitmap bitmap)
-        {
-            double[,] pixels = new double[bitmap.Width, bitmap.Height];
-            for (int i = 0; i < bitmap.Width; i++)
-            {
-                for (int j = 0; j < bitmap.Height; j++)
-                {
-                    Color a = bitmap.GetPixel(j, i);
-                    pixels[i, j] = (a.R + a.G + a.B) / 3;
-                }
 
-            }
 
-            return pixels;
-        }
 
-        private double[,] GetAvgPorog(double [,] pixels)
-        {
-
-            double[,] res = new double[pixels.GetLength(0), pixels.GetLength(1)];
-
-            for (int i = 1; i < res.GetLength(0) - 1; i++)
-            {
-                for (int j = 1; j < res.GetLength(1) - 1; j++)
-                {
-                    double temp = Math.Abs(pixels[i, j] - ((pixels[i, j] + pixels[i - 1, j - 1] + pixels[i - 1, j] + pixels[i - 1, j + 1] + pixels[i, j - 1] + pixels[i, j + 1] + pixels[i + 1, j - 1] + pixels[i + 1, j + 1] + pixels[i + 1, j]) / 9));
-                    res[i - 1, j - 1] = temp;
-                    if (double.Parse(textBox1.Text) < temp)
-                    {
-                        res[i - 1, j - 1] = (pixels[i, j] + pixels[i - 1, j - 1] + pixels[i - 1, j] + pixels[i - 1, j + 1] + pixels[i, j - 1] + pixels[i, j + 1] + pixels[i + 1, j - 1] + pixels[i + 1, j + 1] + pixels[i + 1, j]) / 9;
-                    }
-                }
-            }
-
-            return res;
-        }
 
         private void pictureBox1_DoubleClick(object sender, EventArgs e)
         {
@@ -1043,8 +1011,10 @@ namespace EuclidImage
         private void button6_Click(object sender, EventArgs e)
         {
             chart1.Series[0].Points.Clear();
-            var arr = GetAvgPorog(GetAvgValuesForFourthLab(firstBitmap));
-            var arr2 = GetAvgValuesForFourthLab(firstBitmap);
+            
+            var arr = GetAvgValuesForFourthLab(firstBitmap);
+            var arrayForFourthLab = GetArrayForFourthLab(GetAvgValuesForFourthLab(firstBitmap));
+            var arr2 = GetAvgPorog(arr);
             double[,] arr3 = new double[firstBitmap.Width, firstBitmap.Height];
 
             Bitmap bitmap = new Bitmap(firstBitmap.Width, firstBitmap.Height);
@@ -1053,16 +1023,18 @@ namespace EuclidImage
             {
                 for (int j = 0; j < arr.GetLength(0); j++)
                 {
-                    int avg = (int)arr[i,j];
+                    int avg = (int)arrayForFourthLab[i,j];
                     Color c = Color.FromArgb(avg, avg, avg);
                     bitmap.SetPixel(j, i, c);
                     arr3[i, j] = Math.Abs(arr[i, j] - arr2[i, j]);
                 }
             }
 
-            var form2 = new Form2(arr);
+            var form2 = new Form2(arr2);
+            form2.Text = "2 Таблица";
             form2.Show();
             var form3 = new Form2(arr3);
+            form3.Text = "3 Таблица";
             form3.Show();
 
 
@@ -1074,6 +1046,70 @@ namespace EuclidImage
             pictureBox2.Width = secondBitMap.Width + 120;
             pictureBox2.Height = secondBitMap.Height + 120;
             DrawGistogramm(GetGrayscaleArrayFromBitmap(bitmap));
+        }
+
+        private double[,] GetAvgValuesForFourthLab(Bitmap bitmap)
+        {
+            double[,] pixels = new double[bitmap.Width, bitmap.Height];
+            for (int i = 0; i < bitmap.Width; i++)
+            {
+                for (int j = 0; j < bitmap.Height; j++)
+                {
+                    Color a = bitmap.GetPixel(j, i);
+                    pixels[i, j] = (a.R + a.G + a.B) / 3;
+                }
+            }
+
+            return pixels;
+        }
+
+        private double[,] GetAvgPorog(double[,] pixels)
+        {
+
+            double[,] res = new double[pixels.GetLength(0), pixels.GetLength(1)];
+
+            for (int i = 1; i < res.GetLength(0) - 1; i++)
+            {
+                for (int j = 1; j < res.GetLength(1) - 1; j++)
+                {
+                    res[i, j] = Math.Abs(
+                         pixels[i, j] - ((pixels[i, j]
+                         + pixels[i - 1, j - 1]
+                         + pixels[i - 1, j] + pixels[i - 1, j + 1]
+                         + pixels[i, j - 1] + pixels[i, j + 1]
+                         + pixels[i + 1, j - 1] + pixels[i + 1, j + 1]
+                         + pixels[i + 1, j]) / 9));
+                }
+            }
+
+            return res;
+        }
+
+
+        private double[,] GetArrayForFourthLab(double[,] pixels)
+        {
+
+            double[,] res = new double[pixels.GetLength(0), pixels.GetLength(1)];
+
+            for (int i = 1; i < res.GetLength(0) - 1; i++)
+            {
+                for (int j = 1; j < res.GetLength(1) - 1; j++)
+                {
+                    double temp = Math.Abs(
+                        pixels[i, j] - ((pixels[i, j]
+                        + pixels[i - 1, j - 1]
+                        + pixels[i - 1, j] + pixels[i - 1, j + 1]
+                        + pixels[i, j - 1] + pixels[i, j + 1]
+                        + pixels[i + 1, j - 1] + pixels[i + 1, j + 1]
+                        + pixels[i + 1, j]) / 9));
+                    if (double.Parse(textBox1.Text) < temp)
+                    {
+                        res[i - 1, j - 1] = (pixels[i, j] + pixels[i - 1, j - 1] + pixels[i - 1, j] + pixels[i - 1, j + 1] + pixels[i, j - 1] + pixels[i, j + 1] + pixels[i + 1, j - 1] + pixels[i + 1, j + 1] + pixels[i + 1, j]) / 9;
+                    }
+                }
+            }
+
+            return res;
         }
     }
 
