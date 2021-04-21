@@ -42,7 +42,7 @@ namespace EuclidImage
             {
                 for (int j = 1; j < arrayForEroziya.GetLength(1) - 1; j++)
                 {
-                    if (arrayForEroziya[i, j] == mask[1, 1] &&
+                    if (arrayForEroziya[i, j] == 1 && arrayForEroziya[i, j] == mask[1, 1] &&
                         arrayForEroziya[i - 1, j - 1] == mask[0, 0] &&
                         arrayForEroziya[i - 1, j] == mask[0, 1] &&
                         arrayForEroziya[i - 1, j + 1] == mask[0, 2] &&
@@ -187,7 +187,7 @@ namespace EuclidImage
                     var c = itemArray[0];
                     var d = itemArray[1];
 
-                    res.Add(BitmapHandler.EqulidDistance(double.Parse(itemArray[0]), double.Parse(itemArray[1]), double.Parse(itemValues[i][0]), double.Parse(itemValues[i][1])));
+                    res.Add(EqulidDistance(double.Parse(itemArray[0]), double.Parse(itemArray[1]), double.Parse(itemValues[i][0]), double.Parse(itemValues[i][1])));
                 }
 
                 result.Add(res.Min());

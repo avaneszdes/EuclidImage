@@ -535,11 +535,16 @@ namespace EuclidImage
             int index = 0;
             foreach (KeyValuePair<Color, double> par in rezul)
             {
-                chart1.Series[0].Points.AddXY($"{par.Key.R}-{par.Key.G}-{par.Key.B}" , par.Value);
-                chart1.Series[0].Points[index].Color = par.Key;
-                index++;
-                chart1.Series[0].IsValueShownAsLabel = true;
+                if(par.Key.Name != "0")
+                {
+                    chart1.Series[0].Points.AddXY($"{par.Key.R}-{par.Key.G}-{par.Key.B}", par.Value);
+                    chart1.Series[0].Points[index].Color = par.Key;
+                    index++;
+                    chart1.Series[0].IsValueShownAsLabel = true;
+                }
+
             }
+            rezul.Clear();
         }
 
         private void AddDataToDataGridView(double[,] arr)
@@ -972,7 +977,9 @@ namespace EuclidImage
         private void button7_Click(object sender, EventArgs e)
         {
             var mask = BitmapHandler.GetMaskValues(Mask);
-            Expansion(BitmapHandler.Eroziya(bitmapHandler.GetBinaryArrayFromBitmap(firstBitmap), mask), mask);
+            var expandsValues = Expansion(BitmapHandler.Eroziya(bitmapHandler.GetBinaryArrayFromBitmap(firstBitmap), mask), mask);
+            AddDataToDataGridView(expandsValues);
+            DrawGistogrammForColorBitmap(GetColorFromColorBitmap(secondBitMap));
         }
 
         private double[,] Expansion(double[,] arrayForEroziya, double[,] mask)
@@ -983,7 +990,7 @@ namespace EuclidImage
             {
                 for (int j = 1; j < arrayForEroziya.GetLength(1) - 1; j++)
                 {
-                    if (arrayForEroziya[i, j] == mask[1, 1] ||
+                    if (arrayForEroziya[i, j] == 0 && arrayForEroziya[i, j] == mask[1, 1] ||
                         arrayForEroziya[i - 1, j - 1] == mask[0, 0] ||
                         arrayForEroziya[i - 1, j] == mask[0, 1] ||
                         arrayForEroziya[i - 1, j + 1] == mask[0, 2] ||
@@ -994,13 +1001,13 @@ namespace EuclidImage
                         arrayForEroziya[i + 1, j] == mask[2, 1]
                        )
                     {
-                        result[i, j] = 1;
+                        result[i - 1, j - 1] = 1;
 
                         bitmap.SetPixel(j, i, Color.Black);
                     }
                     else
                     {
-                        result[i, j] = 0;
+                        result[i - 1, j - 1] = 0;
                         bitmap.SetPixel(j, i, Color.White);
                     }
                 }
@@ -1013,9 +1020,6 @@ namespace EuclidImage
             pictureBox2.Location = new Point(pictureBox1.Location.X - 5, pictureBox1.Height + 15);
             pictureBox2.Width = secondBitMap.Width + 135;
             pictureBox2.Height = secondBitMap.Height + 135;
-            AddDataToDataGridView(result);
-            DrawGistogramm(GetGrayscaleArrayFromBitmap(bitmap));
-
             return result;
         }
 
