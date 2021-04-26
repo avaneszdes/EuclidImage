@@ -17,6 +17,8 @@ namespace EuclidImage
             dataGridView1.Hide();
             dataGridView1.Font = new Font("Verdana", 10, FontStyle.Italic);
             dataGridView1.AutoGenerateColumns = false;
+            Mask.AutoGenerateColumns = false;
+            Mask.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
             panel2.Location = new Point(5, 5);
             this.Width = panel2.Width + 25;
             this.Height = panel2.Height + 50;
@@ -30,7 +32,7 @@ namespace EuclidImage
         //int[,] signsForGreyScaleBitmap;
         Bitmap secondBitMap;
         Bitmap firstBitmap;
-        
+
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -535,7 +537,7 @@ namespace EuclidImage
             int index = 0;
             foreach (KeyValuePair<Color, double> par in rezul)
             {
-                if(par.Key.Name != "0")
+                if (par.Key.Name != "0")
                 {
                     chart1.Series[0].Points.AddXY($"{par.Key.R}-{par.Key.G}-{par.Key.B}", par.Value);
                     chart1.Series[0].Points[index].Color = par.Key;
@@ -581,7 +583,7 @@ namespace EuclidImage
             secondBitMap = bitmap;
         }
 
-        
+
 
         private double[,] GetAvgValuesFromGreyScaleBitmap(Bitmap bitmap)
         {
@@ -931,7 +933,7 @@ namespace EuclidImage
             DrawGistogramm(GetGrayscaleArrayFromBitmap(bitmap));
         }
 
-        
+
 
         private double[,] GetAvgValuesForFourthLab(Bitmap bitmap)
         {
@@ -971,13 +973,14 @@ namespace EuclidImage
             return res;
         }
 
-       
-        
+
+
 
         private void button7_Click(object sender, EventArgs e)
         {
             var mask = BitmapHandler.GetMaskValues(Mask);
             var expandsValues = Expansion(BitmapHandler.Eroziya(bitmapHandler.GetBinaryArrayFromBitmap(firstBitmap), mask), mask);
+            //var expandsValues = BitmapHandler.Eroziya(bitmapHandler.GetBinaryArrayFromBitmap(firstBitmap), mask);
             AddDataToDataGridView(expandsValues);
             DrawGistogrammForColorBitmap(GetColorFromColorBitmap(secondBitMap));
         }
@@ -986,30 +989,31 @@ namespace EuclidImage
         {
             double[,] result = new double[arrayForEroziya.GetLength(0), arrayForEroziya.GetLength(1)];
             Bitmap bitmap = new Bitmap(firstBitmap.Width, firstBitmap.Height);
+
             for (int i = 1; i < arrayForEroziya.GetLength(0) - 1; i++)
             {
                 for (int j = 1; j < arrayForEroziya.GetLength(1) - 1; j++)
                 {
-                    if (arrayForEroziya[i, j] == 0 && arrayForEroziya[i, j] == mask[1, 1] ||
-                        arrayForEroziya[i - 1, j - 1] == mask[0, 0] ||
-                        arrayForEroziya[i - 1, j] == mask[0, 1] ||
-                        arrayForEroziya[i - 1, j + 1] == mask[0, 2] ||
-                        arrayForEroziya[i, j - 1] == mask[1, 0] ||
-                        arrayForEroziya[i, j + 1] == mask[1, 2] ||
-                        arrayForEroziya[i + 1, j - 1] == mask[2, 0] ||
-                        arrayForEroziya[i + 1, j + 1] == mask[2, 2] ||
-                        arrayForEroziya[i + 1, j] == mask[2, 1]
-                       )
+                    if (arrayForEroziya[i, j] == mask[1, 1] && mask[1, 1] == 1 ||
+                   arrayForEroziya[i - 1, j - 1] == mask[0, 0] && mask[0, 0] == 1 ||
+                   arrayForEroziya[i - 1, j] == mask[0, 1] && mask[0, 1] == 1 ||
+                   arrayForEroziya[i - 1, j + 1] == mask[0, 2] && mask[0, 2] == 1 ||
+                   arrayForEroziya[i, j - 1] == mask[1, 0] && mask[1, 0] == 1 ||
+                   arrayForEroziya[i, j + 1] == mask[1, 2] && mask[1, 2] == 1 ||
+                   arrayForEroziya[i + 1, j - 1] == mask[2, 0] && mask[2, 0] == 1 ||
+                   arrayForEroziya[i + 1, j + 1] == mask[2, 2] && mask[2, 2] == 1 ||
+                   arrayForEroziya[i + 1, j] == mask[2, 1] && mask[2, 1] == 1
+                  )
                     {
-                        result[i - 1, j - 1] = 1;
-
+                        result[i, j] = 1;
                         bitmap.SetPixel(j, i, Color.Black);
                     }
                     else
                     {
-                        result[i - 1, j - 1] = 0;
+                        result[i, j] = 0;
                         bitmap.SetPixel(j, i, Color.White);
                     }
+
                 }
             }
 

@@ -38,28 +38,47 @@ namespace EuclidImage
         public static double[,] Eroziya(double[,] arrayForEroziya, double[,] mask)
         {
             double[,] result = new double[arrayForEroziya.GetLength(0), arrayForEroziya.GetLength(1)];
+            var maskList = new List<int[]>();
+            for (int i = 0; i < mask.GetLength(0); i++)
+            {
+                for (int j = 0; j < mask.GetLength(1); j++)
+                {
+                    if (mask[i, j] == 1)
+                    {
+                        maskList.Add(new[] { i, j });
+                    }
+                }
+            }
+
             for (int i = 1; i < arrayForEroziya.GetLength(0) - 1; i++)
             {
                 for (int j = 1; j < arrayForEroziya.GetLength(1) - 1; j++)
                 {
-                    if (arrayForEroziya[i, j] == 1 && arrayForEroziya[i, j] == mask[1, 1] &&
-                        arrayForEroziya[i - 1, j - 1] == mask[0, 0] &&
-                        arrayForEroziya[i - 1, j] == mask[0, 1] &&
-                        arrayForEroziya[i - 1, j + 1] == mask[0, 2] &&
-                        arrayForEroziya[i, j - 1] == mask[1, 0] &&
-                        arrayForEroziya[i, j + 1] == mask[1, 2] &&
-                        arrayForEroziya[i + 1, j - 1] == mask[2, 0] &&
-                        arrayForEroziya[i + 1, j + 1] == mask[2, 2] &&
-                        arrayForEroziya[i + 1, j] == mask[2, 1]
-                       )
+                    int temp = 0; ;
+
+                    if(arrayForEroziya[i, j] == 1)
+                    {
+                        foreach (var item in maskList)
+                        {
+                            var ii = item[0];
+                            var jj = item[1];
+
+                            if (arrayForEroziya[i + ii - 1, j + jj - 1] == 1)
+                            {
+                                temp++;
+                            }
+
+                        }
+                    }
+
+                    if (temp == maskList.Count)
                     {
                         result[i, j] = 1;
                     }
-                    else
-                    {
-                        result[i, j] = 0;
-                    }
+
                 }
+
+                   
             }
 
 
